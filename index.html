@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>銷售教練 Service & Sales Coach</title>
+<meta name="description" content="AI 顧客服務與銷售教練：把產品知識、顧客情境、服務流程與銷售技巧變成互動模擬練習，每一句回答都有教練即時點評。資料只存在你的裝置。">
+<meta name="theme-color" content="#0b6f78">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="銷售教練">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#f3f7f7; --surface:#ffffff; --surface-2:#e9f1f1; --line:#d8e4e4;
+  --text:#14282b; --muted:#5f7579; --brand:#0b6f78; --brand-2:#10909b; --brand-soft:#dcf0f1;
+  --accent:#e8664a; --accent-soft:#fde9e3; --gold:#e6a92e;
+  --ok:#1d8656; --ok-soft:#e1f3ea; --mid:#b77800; --mid-soft:#fff1d6; --bad:#c6392f; --bad-soft:#fde4e1;
+  --me:#0b6f78; --me-text:#ffffff; --cust:#ffffff; --coach:#fff8e8;
+  --shadow:0 2px 10px rgba(10,50,55,.08); --fs:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1a1c; --surface:#172527; --surface-2:#1f3134; --line:#2b4144;
+    --text:#e5f0f0; --muted:#94aaad; --brand:#4cc3cc; --brand-2:#6fd3da; --brand-soft:#173b3e;
+    --accent:#ff8a6e; --accent-soft:#3d2620; --ok:#5fcf98; --ok-soft:#173326; --mid:#f0b54a; --mid-soft:#3a2d12; --bad:#ff7d72; --bad-soft:#3d1d1a;
+    --me:#1f7f87; --me-text:#ffffff; --cust:#1f3134; --coach:#2f2a1b; --shadow:0 2px 10px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1a1c; --surface:#172527; --surface-2:#1f3134; --line:#2b4144;
+  --text:#e5f0f0; --muted:#94aaad; --brand:#4cc3cc; --brand-2:#6fd3da; --brand-soft:#173b3e;
+  --accent:#ff8a6e; --accent-soft:#3d2620; --ok:#5fcf98; --ok-soft:#173326; --mid:#f0b54a; --mid-soft:#3a2d12; --bad:#ff7d72; --bad-soft:#3d1d1a;
+  --me:#1f7f87; --me-text:#ffffff; --cust:#1f3134; --coach:#2f2a1b; --shadow:0 2px 10px rgba(0,0,0,.3);
+}
+:root.big{--fs:19px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:var(--fs)/1.6 system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--brand)}
+#top{position:sticky;top:0;z-index:20;background:var(--bg);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px;transition:box-shadow .2s}
+#top.scrolled{box-shadow:0 1px 0 var(--line)}
+#top h1{font-size:1.15rem;margin:0;flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+#top h1 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#top img{width:28px;height:28px;border-radius:7px}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:1.05rem;flex:none}
+main{max-width:760px;margin:0 auto;padding:4px 16px calc(96px + env(safe-area-inset-bottom))}
+nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav#tabs button{flex:1;max-width:150px;border:0;background:none;padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.74rem;color:var(--muted)}
+nav#tabs button b{font-size:1.3rem;line-height:1.2;font-weight:400}
+nav#tabs button[aria-current="page"]{color:var(--brand);font-weight:700}
+body.playing nav#tabs{display:none}
+#backBtn{display:none;font-size:1.5rem;line-height:1} body.playing #backBtn{display:grid}
+body.playing main{padding-bottom:16px}
+h2{font-size:1.2rem;margin:18px 0 8px}
+h3{font-size:1.02rem;margin:14px 0 6px}
+p{margin:6px 0}
+.muted{color:var(--muted)}
+.small{font-size:.86em}
+.grow{flex:1;min-width:0}
+.row{display:flex;gap:10px;align-items:center}
+.wrap{flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:10px 0;box-shadow:var(--shadow)}
+.card.hero{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border:0}
+.card.hero .muted{color:rgba(255,255,255,.85)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .btn.primary,:root:not([data-theme="light"]) .btn.primary{color:#fff}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 12px;min-height:36px;font-size:.9em}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5}
+.hero .btn{background:#fff;color:#0b6f78;border:0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.88em}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.tag{display:inline-block;font-size:.76em;padding:1px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);margin-right:4px;white-space:nowrap}
+.tag.b{background:var(--brand-soft);color:var(--brand)}
+.tag.a{background:var(--accent-soft);color:var(--accent)}
+.scen{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:12px 14px;margin:8px 0;box-shadow:var(--shadow)}
+.av{width:48px;height:48px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:1.6rem;flex:none}
+.score-badge{flex:none;min-width:46px;text-align:center;border-radius:10px;padding:3px 6px;font-weight:700;font-size:.9em}
+.s-good{background:var(--ok-soft);color:var(--ok)} .s-mid{background:var(--mid-soft);color:var(--mid)} .s-bad{background:var(--bad-soft);color:var(--bad)} .s-none{background:var(--surface-2);color:var(--muted);font-weight:500}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:640px){.grid2{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.kpi b{display:block;font-size:1.5rem;line-height:1.2}
+.kpi span{font-size:.8em;color:var(--muted)}
+.list-btn{width:100%;display:flex;gap:12px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:13px 4px}
+.list-btn:last-child{border-bottom:0}
+.list-btn .ic{font-size:1.25rem;width:28px;text-align:center}
+/* 練習畫面 */
+.persona{display:flex;gap:12px;align-items:flex-start}
+.mood{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.85em}
+.mood .bar{flex:1;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.mood .bar i{display:block;height:100%;border-radius:99px;transition:width .5s,background .5s}
+.chat{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.msg{max-width:86%;padding:9px 13px;border-radius:16px;white-space:pre-wrap;word-break:break-word;animation:pop .25s ease}
+.msg.c{align-self:flex-start;background:var(--cust);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.m{align-self:flex-end;background:var(--me);color:var(--me-text);border-bottom-right-radius:4px}
+.msg.k{align-self:stretch;max-width:100%;background:var(--coach);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;font-size:.92em}
+.msg.k.q2{border-left-color:var(--ok)} .msg.k.q1{border-left-color:var(--mid)} .msg.k.q0{border-left-color:var(--bad)}
+.msg .who{display:block;font-size:.75em;font-weight:700;opacity:.75;margin-bottom:2px}
+.msg.sys{align-self:center;background:none;color:var(--muted);font-size:.85em;padding:2px}
+.say{border:0;background:none;padding:0 0 0 6px;font-size:.95em;opacity:.7}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.composer{position:sticky;bottom:0;background:var(--bg);padding:8px 0 calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 13px;margin:6px 0;line-height:1.5}
+.opt:hover{border-color:var(--brand)}
+.opt b{color:var(--brand);margin-right:6px}
+textarea,input[type=text],input[type=number],select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px}
+textarea{resize:vertical;min-height:84px}
+label.f{display:block;margin:10px 0 4px;font-weight:600;font-size:.92em}
+.dimrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.92em}
+.dimrow .name{width:88px;flex:none}
+.dimrow .bar{flex:1;height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.dimrow .bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+.dimrow .v{width:38px;text-align:right;font-weight:700}
+.ring{width:132px;height:132px;margin:0 auto;display:block}
+.center{text-align:center}
+details.acc{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:8px 0;padding:0 14px}
+details.acc summary{list-style:none;padding:12px 0;font-weight:700;display:flex;align-items:center;gap:10px;cursor:pointer}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"›";margin-left:auto;transition:transform .2s;color:var(--muted)}
+details.acc[open] summary::after{transform:rotate(90deg)}
+details.acc .body{padding:0 0 12px}
+.step-ic{width:36px;height:36px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:800;flex:none}
+ul.tight{margin:4px 0;padding-left:1.2em} ul.tight li{margin:2px 0}
+.quote{background:var(--surface-2);border-radius:10px;padding:8px 12px;margin:6px 0;font-size:.94em}
+table.t{width:100%;border-collapse:collapse;font-size:.9em}
+table.t td,table.t th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.t th{color:var(--muted);font-weight:600}
+.bad-t{color:var(--bad)} .ok-t{color:var(--ok)}
+.prod{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px;margin:8px 0}
+.prod .pi{font-size:1.7rem;width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.badge{display:inline-flex;flex-direction:column;align-items:center;width:82px;text-align:center;font-size:.75em;gap:2px;margin:4px;color:var(--muted)}
+.badge b{font-size:1.7rem;font-weight:400;width:52px;height:52px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;filter:grayscale(1);opacity:.45}
+.badge.on{color:var(--text)} .badge.on b{filter:none;opacity:1;background:var(--mid-soft)}
+.banner{display:flex;gap:10px;align-items:center;border-radius:14px;padding:10px 12px;margin:8px 0;background:var(--brand-soft)}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:50;display:none}
+#sheet.open{display:block}
+#sheet .bk{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+#sheet .pane{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:var(--bg);border-radius:20px 20px 0 0;padding:6px 16px calc(20px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto;animation:up .25s ease}
+#sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 6px}
+#sheet .shead{display:flex;align-items:center;gap:8px;position:sticky;top:-6px;background:var(--bg);padding:6px 0;z-index:2}
+#sheet .shead h2{margin:0;flex:1;font-size:1.1rem}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#14282b;color:#fff;border-radius:12px;padding:10px 14px;z-index:60;display:none;align-items:center;gap:12px;max-width:calc(100% - 32px);box-shadow:0 4px 20px rgba(0,0,0,.25)}
+#toast.show{display:flex}
+#toast button{background:none;border:0;color:#7fe0e6;font-weight:700}
+.qopt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;margin:6px 0}
+.qopt.right{border-color:var(--ok);background:var(--ok-soft)} .qopt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.demo .composer{position:static}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header id="top">
+  <button class="icon-btn" id="backBtn" aria-label="回到練習列表">‹</button>
+  <h1><img src="icons/favicon-32.png" alt=""><span id="title">銷售教練</span></h1>
+  <button class="icon-btn" id="helpBtn" aria-label="使用說明">？</button>
+</header>
+<main id="view"></main>
+<nav id="tabs">
+  <button data-tab="practice"><b>🎯</b>練習</button>
+  <button data-tab="knowledge"><b>📚</b>知識</button>
+  <button data-tab="flow"><b>🧭</b>流程</button>
+  <button data-tab="progress"><b>📈</b>成長</button>
+  <button data-tab="more"><b>⚙️</b>更多</button>
+</nav>
+<div id="sheet" aria-hidden="true"><div class="bk" data-act="close-sheet"></div><div class="pane" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div></div>
+<div id="toast" role="status"><span id="toastMsg"></span><button id="toastBtn"></button></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   內容資料：評分面向、商品、情境、異議、流程、合規用語
+   ===================================================================== */
+const DIMS = [
+  { k: 'E', n: '同理傾聽', i: '💗', tip: '先接住顧客的感受，例如「會擔心很正常」「謝謝您告訴我」，再談產品。' },
+  { k: 'A', n: '需求探詢', i: '🔍', tip: '多用好回答的開放式問題，例如「平常…嗎？」「您比較在意的是…？」' },
+  { k: 'K', n: '產品專業', i: '📘', tip: '說出具體的成分、用法、用量或適用膚質，讓顧客覺得你真的懂。' },
+  { k: 'V', n: '價值說明', i: '💎', tip: '把特色轉成「對您來說的好處」，必要時換算成一天多少錢、可用多久。' },
+  { k: 'C', n: '推進成交', i: '🤝', tip: '每次對話都留下一個沒壓力的下一步：試用、預約、加 LINE、幫忙登記。' },
+];
+const DIM = Object.fromEntries(DIMS.map(d => [d.k, d]));
+
+const PRODUCTS = [
+  { id: 'serum', icon: '💧', name: '水潤玻尿酸精華', cat: '保養', price: 1280, size: '30ml，每天早晚 1–2 滴約可用 2 個月',
+    fab: [
+      { f: '三重分子玻尿酸＋維他命 B5', a: '大小分子分層補水，吸收快不黏膩', b: '上妝前用，妝感更服貼、不卡粉' },
+      { f: '無酒精、無香精，通過敏感肌測試', a: '減少常見刺激來源', b: '換季、肌膚狀態不穩時也比較安心使用' },
+      { f: '清爽水感質地', a: '可與化妝水、乳液疊擦', b: '只要多一個步驟，不必重整保養程序' },
+    ],
+    who: '換季乾燥、上妝卡粉、想要簡單保濕的人', pair: ['cream', 'sun'],
+    faq: [['敏感肌可以用嗎？', '已通過敏感肌測試，但每個人膚況不同，建議先在耳後或下巴局部試用 3 天。'], ['要擦在哪一步？', '化妝水之後、乳液之前，趁臉微濕時輕拍吸收。']],
+    keys: ['玻尿酸', '保濕', '補水', '吸收', '清爽', '服貼', '卡粉', '無酒精', '無香精', '敏感肌測試', '1–2 滴', '兩個月', '試用'] },
+  { id: 'sun', icon: '☀️', name: '輕透防曬乳 SPF50+', cat: '保養', price: 880, size: '50ml，每天全臉一元硬幣大小約可用 2 個月',
+    fab: [
+      { f: 'SPF50+／PA++++ 廣效防護', a: '同時阻擋 UVA、UVB', b: '通勤、戶外活動都能好好保護肌膚' },
+      { f: '防水抗汗配方', a: '流汗、玩水時比較不易脫落', b: '去海邊或運動時也安心，但仍需每 2 小時補擦' },
+      { f: '輕透乳液質地、可當妝前', a: '不泛白、不厚重', b: '早上少一個步驟，出門更快' },
+    ],
+    who: '每天通勤、戶外活動多、怕油膩的人', pair: ['serum'],
+    faq: [['要多久補擦一次？', '戶外或流汗、玩水後，建議每 2 小時補擦一次。'], ['需要卸妝嗎？', '防水型建議用卸妝產品或洗卸二合一清潔。']],
+    keys: ['SPF50', 'PA++++', 'UVA', 'UVB', '防水', '抗汗', '補擦', '兩小時', '2 小時', '不泛白', '妝前'] },
+  { id: 'cream', icon: '🌙', name: '晚安修護乳霜', cat: '保養', price: 1580, size: '50ml，局部使用約可用 3 個月',
+    fab: [
+      { f: '神經醯胺＋角鯊烷', a: '在睡眠時加強鎖水', b: '早上起床肌膚感覺比較飽滿、有光澤' },
+      { f: '滋潤型霜狀質地', a: '可依膚況局部加強', b: '混合肌只擦乾的地方，也不怕油' },
+      { f: '可兼作眼周保養', a: '一瓶多用', b: '不必另外再買眼霜，省錢也省步驟' },
+    ],
+    who: '乾燥肌、熬夜後膚況差、想加強夜間保養的人', pair: ['serum'],
+    faq: [['混合肌會不會太油？', 'T 字部位薄擦或跳過，只擦兩頰與眼周等乾燥處。'], ['長痘痘還能擦嗎？', '痘痘處先避開；若持續發炎請先就醫。']],
+    keys: ['神經醯胺', '角鯊烷', '鎖水', '滋潤', '修護', '局部', '兩頰', '眼周', '晚上', '三個月'] },
+  { id: 'collagen', icon: '🥤', name: '膠原蛋白飲（保健食品）', cat: '保健', price: 1980, size: '一盒 30 包，每天 1 包可吃 1 個月',
+    fab: [
+      { f: '小分子膠原蛋白胜肽＋維生素 C', a: '補充日常飲食中不易攝取的營養', b: '作為日常營養補給，幫助維持好氣色' },
+      { f: '隨身包、微酸果香', a: '直接喝或加水都可以', b: '上班、出門也方便持續補充' },
+    ],
+    who: '飲食不均衡、想補充日常營養的人（保健食品，不能取代醫療）', pair: ['vita'],
+    faq: [['可以改善膝蓋痛嗎？', '保健食品不能宣稱治療或改善疾病；身體不適請先就醫。'], ['一天吃多少？', '依標示每天 1 包，不需加量。']],
+    keys: ['膠原蛋白', '胜肽', '維生素 C', '營養', '補給', '好氣色', '每天 1 包', '一天一包', '保健食品', '看醫生', '就醫', '醫師'] },
+  { id: 'vita', icon: '💊', name: '綜合維生素（保健食品）', cat: '保健', price: 990, size: '60 錠，每天 2 錠可吃 1 個月',
+    fab: [
+      { f: '13 種維生素＋8 種礦物質', a: '一次補足多種日常營養', b: '外食族也能簡單維持營養均衡' },
+      { f: '早晚各 1 錠', a: '分次補充', b: '飯後吃，不必記太多種保健品' },
+    ],
+    who: '外食族、忙碌上班族（保健食品，不能取代醫療）', pair: ['collagen'],
+    faq: [['可以跟藥一起吃嗎？', '正在服藥者請先詢問醫師或藥師。']],
+    keys: ['維生素', '礦物質', '外食', '均衡', '飯後', '醫師', '藥師'] },
+  { id: 'shampoo', icon: '🧴', name: '胺基酸頭皮洗髮精', cat: '髮品', price: 650, size: '400ml，約可用 2 個月',
+    fab: [
+      { f: '胺基酸溫和潔淨', a: '洗淨力足但不過度乾澀', b: '天天洗頭的人，頭皮也比較舒服' },
+      { f: '薄荷清涼感', a: '洗後清爽', b: '夏天或容易出油時，洗完感覺很舒爽' },
+    ],
+    who: '頭皮容易出油、天天洗頭的人', pair: [],
+    faq: [['掉髮可以用嗎？', '一般洗髮精不能宣稱防止掉髮；掉髮嚴重請就醫。']],
+    keys: ['胺基酸', '溫和', '頭皮', '清爽', '薄荷', '出油'] },
+  { id: 'lip', icon: '💄', name: '絲絨持久唇膏', cat: '彩妝', price: 520, size: '3.5g，共 8 色',
+    fab: [
+      { f: '霧面絲絨質地＋保濕油', a: '顯色但不乾', b: '一整天氣色都很好，嘴唇也不容易脫皮' },
+      { f: '8 色從裸色到正紅', a: '日常與約會都有適合色', b: '新手也能挑到不出錯的顏色' },
+    ],
+    who: '想提升氣色、上班族、送禮', pair: ['perfume'],
+    faq: [['會沾杯嗎？', '霧面質地較不易沾杯，但喝飲料仍可能輕微沾附。']],
+    keys: ['霧面', '絲絨', '顯色', '保濕', '色號', '裸色', '氣色'] },
+  { id: 'perfume', icon: '🌸', name: '花果調淡香水', cat: '香氛', price: 1680, size: '30ml，另有香氛身體乳 200ml $680',
+    fab: [
+      { f: '前調柑橘、中調小蒼蘭、後調白麝香', a: '清新不濃烈', b: '素顏、上班都適合，不會讓人有距離感' },
+      { f: '30ml 隨身瓶', a: '方便放包包補噴', b: '第一次送香水也不怕太大瓶用不完' },
+    ],
+    who: '喜歡香氛、送禮、不常化妝的人', pair: ['lip'],
+    faq: [['留香多久？', '淡香水約 3–4 小時，可搭配同香調身體乳延長香氣。'], ['不喜歡可以換嗎？', '依公司退換貨規定，未拆封通常可在期限內換貨。']],
+    keys: ['柑橘', '小蒼蘭', '麝香', '清新', '淡香', '身體乳', '留香', '試香', '禮盒'] },
+];
+
+const CHANNELS = ['門市', 'TM 電話', 'LINE／線上', '到府／直銷', '客服'];
+const SKILLS = ['開場破冰', '需求探詢', '產品推薦', '異議處理', '成交推進', '服務復原', '售後經營', '合規說明'];
+
+// 每個選項：q 品質（2 最佳、1 普通、0 不佳）、s 面向得分（例 'E3A2'，可為負）、x 是否違反合規、fb 教練點評、r 顧客反應
+const SCENARIOS = [
+  { id: 's1', title: '「我只是看看」的顧客', ch: '門市', skill: '開場破冰', lv: 1, products: ['serum'],
+    p: { n: '林小姐', age: 28, av: '👩🏻', bg: '上班族，午休經過門市，手上拿著咖啡，看起來趕時間。', mood: 45, need: '最近換季臉很乾、上妝會卡粉，但很怕被推銷。' },
+    goal: '讓顧客願意停下來聊，問出真實需求，並留下沒有壓力的下一步。',
+    turns: [
+      { c: '（拿起一瓶精華看了看）我只是看看而已。', focus: 'EA', hint: '先讓她安心，再用輕鬆、好回答的問題打開話題。', k: { E: ['慢慢看', '沒關係'], A: ['乾', '最近', '平常'] },
+        o: [
+          { q: 2, s: 'E3A2', t: '沒問題，您慢慢看～最近換季很多人都在找保濕的。冒昧問一下，最近會覺得臉比較乾嗎？', fb: '先給空間、降低壓力，再用季節話題輕輕探詢，顧客不會有被推銷的感覺。', r: '嗯…是有一點。' },
+          { q: 0, s: 'C-1E-1', t: '這瓶是我們的明星商品，現在買一送一！要不要幫您包一瓶？', fb: '顧客還沒說出需求就推成交，會讓她立刻想離開。先建立信任、找出需求。', r: '呃…不用了，我只是看看。' },
+          { q: 1, s: 'E1', t: '好的，有需要再叫我喔。', fb: '有禮貌，但錯過了開啟對話的機會。可以多加一句輕鬆的問題。', r: '（點點頭，繼續看）' },
+        ] },
+      { c: '最近上妝都會卡粉，我也不知道是不是保養沒做好。', focus: 'AK', hint: '先簡單說明原因，再深入了解她現在的保養習慣。', k: { A: ['步驟', '早晚', '緊繃'], K: ['缺水', '保濕'] },
+        o: [
+          { q: 2, s: 'A3K1', t: '卡粉通常跟肌膚缺水有關。想了解一下，您現在早晚的保養大概有哪幾個步驟？洗完臉會覺得緊繃嗎？', fb: '用一句話說明原因，再用具體好回答的問題深入，是需求探詢的好示範。', r: '早上就化妝水跟防曬，晚上偶爾擦乳液，洗完臉會有點緊。' },
+          { q: 1, s: 'K2', t: '那您一定要用這瓶玻尿酸精華，保濕效果很好。', fb: '方向對，但太快下結論。多問一兩個問題，推薦會更有說服力。', r: '每個店員都說自己的保濕很好耶…' },
+          { q: 0, s: 'E-1', t: '您應該是沒有擦乳液吧？這樣當然會卡粉。', fb: '帶著指責的語氣會讓顧客防衛。換成「很多人換季都有同樣狀況」的同理說法。', r: '（有點尷尬）…我有擦啊，只是偶爾。' },
+        ] },
+      { c: '那你覺得我該怎麼辦？我不想買太多瓶。', focus: 'KV', hint: '她怕麻煩也怕花太多錢：一個步驟、一瓶就能解決最好。', k: { V: ['一個步驟', '兩個月'], K: ['1–2 滴', '化妝水'] },
+        o: [
+          { q: 2, s: 'K3V3', t: '其實不用多買，在化妝水後面加一個步驟就好。這瓶玻尿酸精華質地清爽、吸收快，上妝前用 1–2 滴先幫肌膚補水，妝會比較服貼。一瓶 30ml 大概可以用兩個月。', fb: '把特色轉成她在意的好處（不卡粉、步驟少），並換算使用時間，降低價格感受。', r: '只要多一個步驟喔？聽起來還可以。' },
+          { q: 1, s: 'K2', t: '這瓶有玻尿酸、維他命 B5，還通過敏感肌測試，成分很好。', fb: '列成分只是「特色」，要接一句「所以對您來說……」才是好處。', r: '成分我也聽不太懂耶。' },
+          { q: 0, s: 'V-1C-1', t: '我推薦您整套買，化妝水、精華、乳霜一起用效果最好，現在整套有打折。', fb: '她剛說不想買太多，直接推整套等於沒在聽。先解決核心問題，再談搭配。', r: '我就說不想買太多了…' },
+        ] },
+      { c: '可是我怕買了用不習慣，浪費錢。', focus: 'EC', hint: '先同理她的擔心，再給一個「零風險」的下一步。', k: { C: ['試擦', '試用', 'LINE'] },
+        o: [
+          { q: 2, s: 'E2C3', t: '會擔心很正常。要不要先在手背試擦看看質地？我也可以給您一包試用品，用三天覺得服貼再來找我；方便的話留個 LINE，我傳使用小技巧給您。', fb: '先同理、再提供零風險的下一步（試擦、試用、加 LINE），成交與後續關係自然發生。', r: '好啊，先試擦看看。' },
+          { q: 1, s: 'C1', t: '不會啦，大家都說好用，買了一定不會後悔。', fb: '急著保證反而讓人更不安，「一定」也有誇大風險。用試用降低她的顧慮更好。', r: '…我再想想好了。' },
+          { q: 0, s: 'C-1', t: '那您再考慮看看，想好再來。', fb: '放棄太快。顧客說擔心的時候，正是給她安心方案的時機。', r: '好，那我先走了。' },
+        ] },
+    ],
+    end: { good: '林小姐試擦後很喜歡，帶走一瓶精華並加了 LINE，約好下週回報上妝狀況。', mid: '林小姐拿了試用包，說用了再看看。記得三天後主動關心！', bad: '林小姐禮貌地離開了。下次試著多問一點、少推一點。' } },
+
+  { id: 's2', title: '敏感肌怕過敏', ch: '門市', skill: '需求探詢', lv: 2, products: ['serum', 'cream'],
+    p: { n: '陳太太', age: 41, av: '👩🏻‍🦱', bg: '曾經擦別牌精華整臉泛紅，現在只用醫生開的乳液，對新產品很謹慎。', mood: 40, need: '很想改善乾燥，但更怕再次過敏；需要被認真對待與安全的試用方法。' },
+    goal: '了解她過去的過敏經驗，給出專業、安全、不誇大的建議。',
+    turns: [
+      { c: '我皮膚很敏感，之前擦別牌的精華整個臉都紅了，你們的會不會也這樣？', focus: 'EA', hint: '先接住那次不舒服的經驗，再問清楚當時的狀況。千萬別說「保證不會」。', k: { E: ['不舒服', '難怪', '擔心'], A: ['多久', '刺', '癢'] },
+        o: [
+          { q: 2, s: 'E3A2', t: '那次一定很不舒服，難怪您會擔心。想請問一下，當時是擦了多久開始泛紅？是刺刺的還是癢癢的？我想先了解您的狀況。', fb: '先同理、再收集資訊，讓顧客感受到「你在乎的是我，不是業績」。', r: '你這樣問我比較放心…' },
+          { q: 0, s: 'K-1E-1', x: 1, t: '我們的保證不會過敏，很溫和的！', fb: '「保證不過敏」是絕對用語，不能說。可以說「通過敏感肌測試，但建議先局部試用」。', r: '你怎麼能保證？我上次也是聽人家說很溫和…' },
+          { q: 1, s: 'K1', t: '我們的產品很多敏感肌在用，應該還好。', fb: '「應該還好」聽起來不專業，也沒有解決她的擔心。', r: '應該？那還是有可能啊…' },
+        ] },
+      { c: '擦上去大概十分鐘就刺刺熱熱的，後來就不敢亂擦，現在只用醫生開的乳液。', focus: 'AK', hint: '確認她最在意的是什麼，並尊重醫療建議。', k: { A: ['在意', '對嗎'], K: ['酒精', '香精', '敏感肌測試', '醫生'] },
+        o: [
+          { q: 2, s: 'A2K3', t: '了解，所以您最在意的是「溫和不刺激」對嗎？刺熱感有時跟酒精或香精有關，我們這瓶精華是無酒精、無香精，也做過敏感肌測試。不過您目前有在看醫生，建議先問一下醫生再加新產品，會更安心。', fb: '確認需求、說明可能原因、提供產品資訊，並尊重醫療建議——專業又有分寸。', r: '嗯，我下次回診可以問問看。' },
+          { q: 1, s: 'K2', t: '我們這瓶是無酒精無香精的，敏感肌也可以用。', fb: '資訊正確，但少了確認她的需求，以及安全使用的提醒。', r: '喔…是喔。' },
+          { q: 0, s: 'K-2E-1', x: 1, t: '醫生開的乳液都是藥，用久了不好，換我們天然的比較好。', fb: '不可以批評醫療建議或暗示產品能取代藥品，這有很高的合規風險。', r: '（皺眉）醫生開的怎麼會不好？' },
+        ] },
+      { c: '那我如果要試，要怎麼試比較安全？', focus: 'KV', hint: '教她「局部試用」的方法，讓她不必先花錢冒險。', k: { K: ['耳後', '下巴', '三天', '局部'], V: ['試用品', '不用先買'] },
+        o: [
+          { q: 2, s: 'K3V2', t: '建議先擦在耳後或下巴一小塊，連續三天都沒有泛紅再擦全臉，剛開始晚上用一次就好。我先給您一包試用品，不用一開始就買一整瓶。', fb: '具體、安全、零負擔的試用方法，最能打動謹慎型顧客。', r: '這樣我比較敢試。' },
+          { q: 0, s: 'K-1', t: '您就直接擦全臉試試看，有問題再停。', fb: '對敏感肌來說太冒險。教她局部試用，她會覺得你真的在乎她。', r: '全臉喔…萬一又紅怎麼辦？' },
+          { q: 1, s: 'V1', t: '您可以先買一瓶回去試，不適合也可以送給別人用。', fb: '有想降低風險，但「先買」仍是負擔，試用品更貼心。', r: '可是買了不能用很浪費耶。' },
+        ] },
+      { c: '好，那我先試試看。如果有效再來買。', focus: 'C', hint: '約好追蹤的時間與方式，讓她有問題時找得到你。', k: { C: ['LINE', '三天後', '小卡'] },
+        o: [
+          { q: 2, s: 'E1C3', t: '好的！我把試用方法寫在小卡上給您。方便留個 LINE 嗎？三天後我傳訊息問問您擦的狀況，有任何不舒服也可以馬上問我。', fb: '把「有效再來買」變成「三天後我主動關心」，下一步就掌握在你手上。', r: '好啊，這是我的 LINE。' },
+          { q: 1, s: 'C1', t: '好，那您用完再來。', fb: '沒有約定下一步，顧客很容易就忘了。', r: '好。' },
+          { q: 0, s: 'C-1E-1', t: '試用品數量有限，您今天買的話可以送兩包喔。', fb: '她已經說要先試，再施壓會破壞剛建立的信任。', r: '我還是先試試看就好。' },
+        ] },
+    ],
+    end: { good: '陳太太安心地帶走試用品並加了 LINE，三天後回報沒有泛紅，回來買了正貨。', mid: '陳太太帶走了試用品，但沒有留下聯絡方式。下次記得約好追蹤。', bad: '陳太太覺得不太放心，決定還是只用原本的乳液。' } },
+
+  { id: 's3', title: '防曬快用完了：回購提醒', ch: 'TM 電話', skill: '開場破冰', lv: 1, products: ['sun'],
+    p: { n: '王小姐', age: 35, av: '👩🏻‍💼', bg: '上個月在官網買過防曬，接電話時在辦公室。', mood: 40, need: '防曬快用完，下個月要去墾丁，想找防水一點的。' },
+    goal: '用合宜的 TM 開場取得通話許可，從關心切入，順利完成回購。',
+    turns: [
+      { c: '喂？哪位？', focus: 'EC', hint: 'TM 開場四要素：自我介紹、說明來意、時間框架、徵求同意。', k: { E: ['您好'], C: ['方便', '一分鐘'] },
+        o: [
+          { q: 2, s: 'E2C2', t: '王小姐您好，我是〇〇美妝的小美，上個月您買過我們的輕透防曬，想花一分鐘關心一下使用狀況，現在方便說話嗎？', fb: '清楚自我介紹、說明來意、給時間框架並徵求同意，是 TM 開場的黃金四要素。', r: '喔…方便啊，怎麼了嗎？' },
+          { q: 0, s: 'C-1E-1', t: '王小姐您好，我們現在有超優惠活動，防曬第二件五折，要不要幫您訂？', fb: '沒自我介紹、沒徵求同意就直接推銷，很容易被掛電話。', r: '我在上班耶，你哪裡？' },
+          { q: 1, s: 'E1', t: '您好，請問是王小姐嗎？我是〇〇美妝的客服。', fb: '有禮貌，但沒說明來意和需要多少時間，對方仍會警戒。', r: '…有什麼事嗎？' },
+        ] },
+      { c: '嗯，你說。', focus: 'A', hint: '先關心使用狀況，而不是先講促銷。', k: { A: ['習慣', '每天', '快用完'] },
+        o: [
+          { q: 2, s: 'A3E1', t: '謝謝您！想問問防曬用起來還習慣嗎？算一下時間，那瓶應該快用完了，您平常是每天都會擦嗎？', fb: '從使用經驗出發，自然帶到「快用完了」，顧客會覺得被記得、被照顧。', r: '對啊，剩一點點了。' },
+          { q: 1, s: 'V1', t: '我們的防曬最近在打折，想說通知您一下。', fb: '直接講促銷，少了關心。先問使用狀況，對方會覺得被重視。', r: '喔…打幾折？' },
+          { q: 0, s: 'C-1', t: '您的防曬應該用完了，要再訂一瓶嗎？', fb: '用假設口吻逼單，顧客會有被監控的感覺。改用關心的問法。', r: '你們怎麼知道我用完了？' },
+        ] },
+      { c: '下個月要去墾丁，我還在想要不要換一瓶防水一點的。', focus: 'KV', hint: '抓住「海邊」情境，說明對應的特色與正確用法。', k: { K: ['防水', '抗汗', '補擦', 'SPF50'], A: ['油'] },
+        o: [
+          { q: 2, s: 'K3V2A1', t: '去墾丁好棒！我們這瓶輕透防曬是 SPF50+、PA++++，有防水抗汗，不過下水或流很多汗後，建議每兩小時補擦一次。您之前用起來會覺得油嗎？', fb: '連結她的情境、講對應特色和正確用法，再確認使用感受，專業又貼心。', r: '不會油耶，那我再買一瓶好了。' },
+          { q: 1, s: 'K1', t: '我們有防水的，跟之前那瓶差不多。', fb: '說得太少，沒有連結到她的海邊情境。', r: '差不多是多少？' },
+          { q: 0, s: 'K-1', x: 1, t: '我們的防曬完全不怕水，擦一次一整天都不用補。', fb: '「完全不怕水、整天不用補」是誇大又不正確的說法。任何防曬遇水流汗都要補擦。', r: '真的假的？聽起來有點誇張。' },
+        ] },
+      { c: '可是我最近比較忙，沒空上網下單…', focus: 'C', hint: '顧客忙，就幫她把事情辦好。', k: { C: ['幫您', '登記', '寄到', '下週'] },
+        o: [
+          { q: 2, s: 'C3V1', t: '了解您很忙，我直接幫您登記一瓶，下週三前寄到府上，去墾丁前就能收到。要不要順便加一支隨身瓶，方便在海邊補擦？', fb: '主動幫忙處理流程，再提出與情境相關的加購，自然不強迫。', r: '好啊，隨身瓶也加一支！' },
+          { q: 1, s: 'C1', t: '好的，那您有空再上網下單就好。', fb: '把成交丟回給忙碌的顧客，她很可能就忘了。', r: '好，我有空再看。' },
+          { q: 0, s: 'C-2', t: '那我幫您訂三瓶，比較划算喔！', fb: '沒問就自己加量，會讓顧客反感。', r: '三瓶？不用那麼多啦！' },
+        ] },
+    ],
+    end: { good: '王小姐回購防曬並加購隨身瓶，還說下次有需要直接打給你。', mid: '王小姐說有空再看看，記得在出發前再提醒一次。', bad: '王小姐有點不耐煩地掛了電話。' } },
+
+  { id: 's4', title: '「我現在很忙」', ch: 'TM 電話', skill: '異議處理', lv: 2, products: ['perfume'],
+    p: { n: '黃先生', age: 46, av: '👨🏻‍💼', bg: '去年幫太太買過香氛禮盒，接電話時正在開會前。', mood: 35, need: '太太下個月生日，他其實正煩惱要送什麼。' },
+    goal: '尊重對方時間並約到下次通話，再從上次購買切入，完成禮物推薦。',
+    turns: [
+      { c: '我現在很忙，沒空。', focus: 'EC', hint: '尊重時間，用二選一約下次通話。', k: { E: ['不好意思', '打擾'], C: ['幾點', '還是', '明天'] },
+        o: [
+          { q: 2, s: 'E3C2', t: '不好意思打擾您！那我不佔用您時間，請問今天晚上七點或明天中午，哪個時間方便我再打給您？大約兩分鐘就好。', fb: '尊重對方時間，並用二選一約下次，比「那我改天再打」更容易約成。', r: '…那晚上七點好了。' },
+          { q: 0, s: 'C-1E-2', t: '只要一分鐘就好，我很快講完！我們現在有…', fb: '對方說忙還硬講，只會讓他更想掛電話。', r: '我說我在忙！（掛斷）' },
+          { q: 1, s: 'E2', t: '好的，不好意思打擾了，再見。', fb: '有禮貌，但沒有約下次時間，這通電話就白打了。', r: '嗯，再見。' },
+        ] },
+      { c: '（晚上七點）喔對，你中午有打來。什麼事？', focus: 'AE', hint: '從上次的購買經驗切入，關心使用者（他太太）。', k: { A: ['喜歡嗎', '上次'] },
+        o: [
+          { q: 2, s: 'A3E1', t: '謝謝您還記得！去年您幫太太挑了香氛禮盒，想問問太太喜歡嗎？', fb: '從他的購買與家人切入，對話一開始就有溫度。', r: '她很喜歡啊，天天噴。' },
+          { q: 1, s: 'V1', t: '我們新出了幾款香水，想介紹給您。', fb: '直接介紹新品，少了與上次購買的連結。', r: '喔…我對香水不太懂。' },
+          { q: 0, s: 'C-1', t: '我們週年慶到這週末，要不要趁現在買？', fb: '用促銷開頭，對方會立刻覺得又是推銷電話。', r: '我晚點再看好了。' },
+        ] },
+      { c: '下個月她生日，我還不知道要送什麼。', focus: 'AK', hint: '先問預算與喜好，再給建議。', k: { A: ['預算', '喜歡', '實用'], K: ['同系列', '身體乳', '香調'] },
+        o: [
+          { q: 2, s: 'A2K2', t: '既然她喜歡那個香調，可以考慮同系列的香氛組合，讓香味更持久。想請問預算大概多少？她平常喜歡實用的，還是有驚喜感的禮物？', fb: '從她已經喜歡的香味延伸，再確認預算與偏好，推薦就不會失準。', r: '三千左右吧，實用一點的好。' },
+          { q: 1, s: 'K2', t: '那您可以送同系列的身體乳，香味一樣。', fb: '建議合理，但沒有問預算與喜好，推薦比較冒險。', r: '身體乳？會不會太普通？' },
+          { q: 0, s: 'V-1', t: '送最貴的禮盒就對了，女生都喜歡。', fb: '用刻板印象推薦，也沒有了解需求。', r: '最貴是多少？' },
+        ] },
+      { c: '可是我真的不太會挑…', focus: 'VC', hint: '幫他做好選擇，連包裝、寄送都安排好。', k: { V: ['實用', '香味'], C: ['包', '寄', '卡片'] },
+        o: [
+          { q: 2, s: 'V3C3', t: '交給我！三千元內我推薦「同香調淡香水 30ml＋香氛身體乳」，出門、洗完澡都能用，實用又有熟悉的香味。我幫您包成禮盒、附生日卡，生日前三天寄到公司，這樣好嗎？', fb: '具體組合、說明好處、處理包裝與寄送，讓「不會挑」的顧客輕鬆完成。', r: '太好了，就這樣辦！' },
+          { q: 1, s: 'V1C1', t: '那我把幾個組合傳給您，您再自己選。', fb: '對「不會挑」的顧客，幫他做好選擇更貼心。', r: '好…我再看看。' },
+          { q: 0, s: 'C-1', t: '那您直接上官網看看就好。', fb: '顧客已經表明需要協助，推回去等於放棄訂單。', r: '喔，好吧。' },
+        ] },
+    ],
+    end: { good: '黃先生訂了生日禮盒，還說明年結婚紀念日也要找你。', mid: '黃先生說會考慮，記得週末前再傳組合給他。', bad: '黃先生最後在別家買了禮物。' } },
+
+  { id: 's5', title: '「網路上比較便宜」', ch: 'LINE／線上', skill: '異議處理', lv: 2, products: ['serum'],
+    p: { n: '周小姐', age: 31, av: '👩🏻‍💻', bg: '在 LINE 上詢價，習慣比價，也在拍賣網站看過同款。', mood: 45, need: '想省錢，但其實擔心網路買到來路不明或過期的商品。' },
+    goal: '不貶低別人、不隨便降價，用價值與服務說服顧客。',
+    turns: [
+      { c: '這瓶精華網路上便宜快 300 耶，你們怎麼這麼貴？', focus: 'E', hint: '比價是正常的，先肯定她，再了解她看到的是什麼。', k: { E: ['很正常', '謝謝'], A: ['哪個', '平台'] },
+        o: [
+          { q: 2, s: 'E3A1', t: '謝謝您跟我說，比價很正常，換作是我也會比較 😊 想請問您看到的是哪個平台呢？我幫您看一下差在哪裡。', fb: '肯定顧客的行為、不防衛，再主動協助比較，態度就贏一半。', r: '就某個拍賣網站，說是正品。' },
+          { q: 0, s: 'E-2', t: '網路上很多都是假貨啦，買了出問題不要怪我們。', fb: '貶低別人又帶點威脅語氣，會讓顧客覺得你在推卸。', r: '你這樣講有點不舒服耶。' },
+          { q: 1, s: 'V1', t: '我們是原價，沒辦法便宜。', fb: '說的是事實，但沒處理她的感受，對話會卡住。', r: '喔，那我再看看。' },
+        ] },
+      { c: '有人在拍賣網站賣，說是正品。', focus: 'KV', hint: '說「我們能給您什麼」，而不是「別人有多糟」。', k: { K: ['公司貨', '中文標示', '效期'], V: ['安心', '找我'] },
+        o: [
+          { q: 2, s: 'K2V3', t: '了解～我們這邊是公司貨，有完整的中文標示和效期，用起來有任何問題都可以直接找我，我也會提醒您用法、幫您留意補貨。多的錢，是換到「安心」跟「有人幫您顧」。', fb: '用正面的方式說出差異：來源、效期、售後服務，價值就清楚了。', r: '這樣說也是啦…' },
+          { q: 1, s: 'K1', t: '拍賣網站很多來路不明的，我不建議。', fb: '點出風險可以，但用「我們能給您什麼」來說，比貶低別人更好。', r: '也不一定吧。' },
+          { q: 0, s: 'V-1E-1', t: '那您就去網路上買好了。', fb: '情緒性回應等於直接放棄顧客。', r: '…好喔。' },
+        ] },
+      { c: '可是 300 塊還是差蠻多的…', focus: 'VC', hint: '換算成每天的成本，再用合規的優惠或贈品回應。', k: { V: ['一天', '換算', '贈品', '划算'] },
+        o: [
+          { q: 2, s: 'V3C2', t: '我懂，300 塊不是小數目。這瓶大約可以用兩個月，換算一天差不到 5 元。這期剛好有買精華送旅行組化妝水，等於多一個步驟可以試，您覺得這樣划算嗎？', fb: '同理＋換算＋現有優惠，用價值取代降價。', r: '好啦，那贈品還有嗎？' },
+          { q: 1, s: 'C1', t: '那我私下給您打個九折好了。', fb: '隨便降價會傷害價格信任，也可能違反公司規定。用價值與贈品回應比較好。', r: '那可以再便宜一點嗎？' },
+          { q: 0, s: 'C-1', t: '一分錢一分貨啦。', fb: '俗語無法說服人，要具體說出貴在哪裡、值在哪裡。', r: '…（已讀）' },
+        ] },
+      { c: '那贈品現在還有嗎？', focus: 'C', hint: '顧客出現購買訊號，立刻讓流程變簡單。', k: { C: ['保留', '連結', '出貨'] },
+        o: [
+          { q: 2, s: 'C3', t: '還有喔！我現在幫您保留一組，傳訂購連結給您，今天下單明天就出貨。收到後我再傳用法給您 👍', fb: '保留、給連結、說明出貨時間，再預告售後服務，一氣呵成。', r: '好，我現在下單！' },
+          { q: 1, s: 'C1', t: '應該還有，您可以去官網看看。', fb: '把成交流程丟回去，可能就流失了。', r: '喔，我晚點看。' },
+          { q: 0, s: 'C-1', t: '不太確定，我問一下倉庫，明天再回您。', fb: '顧客準備好要買時，要立刻把流程變簡單。', r: '好吧…' },
+        ] },
+    ],
+    end: { good: '周小姐下單並收到贈品，後來還推薦朋友來找你。', mid: '周小姐說晚點再決定，記得隔天再溫和提醒一次。', bad: '周小姐最後在拍賣網站下單了。' } },
+
+  { id: 's6', title: '「膠原蛋白可以治膝蓋痛嗎？」', ch: '到府／直銷', skill: '合規說明', lv: 3, products: ['collagen'],
+    p: { n: '李媽媽', age: 58, av: '👵🏻', bg: '老顧客，最近爬樓梯膝蓋不舒服，聽鄰居說膠原蛋白有效。', mood: 55, need: '希望膝蓋不痛；其實需要的是就醫，以及一位誠實可信的顧問。' },
+    goal: '誠實說明保健食品的定位，建議就醫，同時維持信任與合規的銷售。',
+    turns: [
+      { c: '聽說吃膠原蛋白可以治膝蓋痛，是真的嗎？我最近爬樓梯都會痛。', focus: 'EK', hint: '先同理，再誠實說明：保健食品不能治療疾病。', k: { E: ['辛苦', '困擾', '不舒服'], K: ['保健食品', '醫師', '醫生', '檢查'] },
+        o: [
+          { q: 2, s: 'E2K3', t: '膝蓋痛真的很困擾，爬樓梯一定很辛苦。我要先跟您說清楚，膠原蛋白是保健食品，不能治療疾病喔。膝蓋痛建議先給醫師檢查，找出原因比較安心。', fb: '先同理，再誠實說明保健食品的定位並建議就醫——最專業，也最能贏得長期信任。', r: '喔…原來不能治啊。' },
+          { q: 0, s: 'K-3', x: 1, t: '真的！我們這款吃三個月膝蓋就不痛了，很多人都說有效。', fb: '宣稱「治療、改善疾病」違反食品廣告規範，也可能延誤就醫，絕對不能說。', r: '真的嗎？那我就不用看醫生了！' },
+          { q: 1, s: 'K1', t: '這個我不太確定耶，應該有一點幫助吧。', fb: '模糊回答會讓顧客誤解，也顯得不專業。', r: '應該？那到底有沒有用？' },
+        ] },
+      { c: '那它到底可以幹嘛？', focus: 'KV', hint: '用合規說法說明功能，並連結到她的生活習慣。', k: { K: ['營養', '補給', '維生素 C'], V: ['好氣色', '日常'] },
+        o: [
+          { q: 2, s: 'K3V2', t: '它是補充日常飲食中的膠原蛋白，搭配維生素 C，作為日常營養補給、幫助維持好氣色。像您平常吃得比較清淡，就可以當作日常補充。', fb: '合規地說明功能，並連結到她的飲食習慣，讓產品「剛好適合」。', r: '這樣聽起來比較實在。' },
+          { q: 1, s: 'K1', t: '可以補充營養，整體來說對身體不錯。', fb: '方向沒錯，但太籠統，也沒有連結到她的生活。', r: '對身體不錯是哪裡不錯？' },
+          { q: 0, s: 'K-2', x: 1, t: '可以讓皮膚變好、凍齡十歲，還能預防骨質疏鬆！', fb: '「凍齡」「預防疾病」都是誇大或療效宣稱，不能說。', r: '這麼神奇喔？' },
+        ] },
+      { c: '那我吃這個，膝蓋就不用去看醫生了吧？', focus: 'EK', hint: '再次溫和而堅定地建議就醫，可以主動幫忙。', k: { K: ['醫生', '醫師', '取代', '就醫'], E: ['擔心', '幫您'] },
+        o: [
+          { q: 2, s: 'E2K3', t: '還是要去看醫生喔！保健食品不能取代醫療。您先讓醫生檢查，醫生說沒問題，再把膠原蛋白當成日常營養補充就好。要不要我幫您查一下附近的骨科？', fb: '堅守界線、主動協助就醫，顧客會感受到你真正關心她。', r: '你這樣說我反而比較相信你。' },
+          { q: 1, s: 'K1', t: '這個看您自己決定。', fb: '把責任丟回去，顧客會覺得你不在乎她的健康。', r: '喔…' },
+          { q: 0, s: 'K-3', x: 1, t: '不用啦，吃這個比較天然，看醫生還要吃藥。', fb: '勸人不用就醫，有健康風險也嚴重違規。', r: '好喔，那我先吃吃看。' },
+        ] },
+      { c: '那這一盒要吃多久？', focus: 'VC', hint: '依標示建議量說明，從小量開始，約好回訪。', k: { K: ['一天一包', '每天 1 包', '30 包'], C: ['試試', '回訪', '一個月後'] },
+        o: [
+          { q: 2, s: 'V2C3', t: '一盒 30 包，每天一包可以吃一個月。您可以先買一盒試試口感，等看完醫生、確定沒問題再每天吃。一個月後我再來看看您。', fb: '依標示說明、從小量開始、約好回訪，信任與業績都顧到了。', r: '好，那我先拿一盒。' },
+          { q: 1, s: 'C2', t: '一盒一個月，買三盒比較划算喔。', fb: '推量可以，但她剛建立信任，先從小量開始更好。', r: '三盒有點多…' },
+          { q: 0, s: 'C-1', x: 1, t: '吃越多越好，一天可以吃兩三包。', fb: '超量食用的建議不正確，必須依照標示的建議量。', r: '真的嗎？那要買好多盒。' },
+        ] },
+    ],
+    end: { good: '李媽媽去看了醫生，也買了一盒膠原蛋白當日常補充，還說你是她最信任的顧問。', mid: '李媽媽買了產品，但記得追蹤她是否有去就醫。', bad: '李媽媽以為產品可以治療膝蓋，這可能帶來客訴與健康風險。' } },
+
+  { id: 's7', title: '男友來挑生日禮物', ch: '門市', skill: '產品推薦', lv: 1, products: ['perfume', 'lip'],
+    p: { n: '阿哲', age: 26, av: '🧑🏻', bg: '第一次走進美妝門市，看起來有點緊張。', mood: 50, need: '女友下週生日，預算約兩千；她平常素顏、喜歡香香的東西。' },
+    goal: '透過探詢了解收禮者，推薦合適組合並降低送禮風險。',
+    turns: [
+      { c: '我想買禮物送女朋友，但我完全不懂這些…', focus: 'EA', hint: '先讓他放鬆，再問收禮者是什麼樣的人。', k: { E: ['貼心', '別擔心'], A: ['平常', '化妝'] },
+        o: [
+          { q: 2, s: 'E2A3', t: '好貼心！別擔心，我幫您一起挑。可以先跟我說說女朋友是什麼樣的人嗎？她平常會化妝嗎？', fb: '先肯定、降低他的緊張，再從收禮者出發探詢。', r: '她平常不太化妝，可是很喜歡香香的東西。' },
+          { q: 0, s: 'V-1', t: '送口紅最保險，女生都喜歡口紅。', fb: '刻板印象推薦，沒有了解收禮者。', r: '她好像不太擦口紅耶…' },
+          { q: 1, s: 'V1', t: '那您可以看看這邊的禮盒區。', fb: '讓他自己看，他還是不會挑。主動引導、多問問題。', r: '呃…這些差在哪？' },
+        ] },
+      { c: '她大部分都素顏，喜歡香香的東西。', focus: 'AK', hint: '依喜好縮小範圍，再問預算與場合。', k: { A: ['預算', '節日', '什麼時候'], K: ['淡香水', '身體乳'] },
+        o: [
+          { q: 2, s: 'A2K2', t: '了解，那彩妝可能不是首選。喜歡香香的話，淡香水或香氛身體乳都很適合。請問預算大概多少？是什麼節日要送呢？', fb: '依喜好縮小範圍，再確認預算與場合，推薦就會精準。', r: '她下週生日，預算大概兩千。' },
+          { q: 1, s: 'K1', t: '那就送香水吧。', fb: '方向對，但還沒問預算與場合。', r: '香水要選哪一瓶？' },
+          { q: 0, s: 'K-1E-1', t: '那更要送化妝品，讓她開始化妝！', fb: '不尊重對方的習慣，也沒聽懂需求。', r: '呃…她可能不會喜歡。' },
+        ] },
+      { c: '兩千左右的話，有什麼推薦？', focus: 'VK', hint: '給一個具體組合，並說明為什麼適合她。', k: { K: ['花果', '清新', '30ml'], V: ['素顏', '預算內', '試香'] },
+        o: [
+          { q: 2, s: 'V3K2', t: '我推薦這款花果調淡香水 30ml，味道清新不濃，素顏也很搭，1,680 元；再加一支 300 元左右的護唇膏讓禮物更完整，剛好在預算內。我先噴試香紙給您聞聞看。', fb: '具體組合＋說明為什麼適合她＋讓他親自體驗，推薦有說服力。', r: '這味道不錯！' },
+          { q: 1, s: 'V1', t: '兩千的話，這幾款都可以，您選一個。', fb: '給太多選擇等於沒幫上忙。', r: '我真的不知道怎麼選…' },
+          { q: 0, s: 'V-1E-1', t: '兩千有點少耶，要不要加到三千，比較有誠意。', fb: '質疑顧客的預算會讓人尷尬。', r: '…我預算就兩千。' },
+        ] },
+      { c: '可是如果她不喜歡怎麼辦？', focus: 'EC', hint: '說明換貨方式降低風險，再幫他完成包裝。', k: { E: ['擔心'], C: ['換', '包', '卡片'] },
+        o: [
+          { q: 2, s: 'E2C3', t: '會擔心很正常～依我們的規定，未拆封可以在期限內換其他香味，我把換貨方式寫在卡片上。我幫您包成生日禮盒，再附一張卡片讓您寫祝福，好嗎？', fb: '用換貨機制消除顧慮，再主動完成包裝，送禮者會很感謝你。', r: '太好了，就這組！' },
+          { q: 1, s: 'C1', t: '應該不會啦，這款很多人喜歡。', fb: '沒有真正解決他的顧慮。', r: '應該嗎…' },
+          { q: 0, s: 'C-1', t: '送禮就是心意，不喜歡也沒辦法。', fb: '放棄處理顧慮，顧客可能就不買了。', r: '那我再想想。' },
+        ] },
+    ],
+    end: { good: '阿哲帶走了包裝好的禮盒，女友收到很開心，後來兩人一起回來買身體乳。', mid: '阿哲買了香水，但沒有加購。下次可以更完整地說明組合價值。', bad: '阿哲說要再逛逛，就離開了。' } },
+
+  { id: 's8', title: '用了乳霜長痘痘要退貨', ch: '客服', skill: '服務復原', lv: 3, products: ['cream'],
+    p: { n: '吳小姐', age: 24, av: '😠', bg: '一週前買了晚安修護乳霜，氣沖沖地來到櫃檯。', mood: 20, need: '想被重視與道歉；其實她同時開始用果酸棉片，需要正確的使用建議。' },
+    goal: '先處理情緒、再處理事情，找出原因並提供選擇，把客訴變成信任。',
+    turns: [
+      { c: '我用了你們的乳霜，臉一直長痘痘！我要退貨！', focus: 'E', hint: '先道歉、同理、承擔，不要急著解釋或撇清。', k: { E: ['抱歉', '困擾', '謝謝', '幫您處理'] },
+        o: [
+          { q: 2, s: 'E3A1', t: '真的很抱歉讓您遇到這種狀況，臉上長痘痘一定很困擾。謝謝您直接告訴我，我一定會幫您處理。可以先跟我說是從什麼時候開始的嗎？', fb: '先處理情緒、表達歉意與承擔，再收集資訊——服務復原的第一步。', r: '（語氣緩和一點）大概用了一週吧。' },
+          { q: 0, s: 'E-2', t: '不可能吧，我們的乳霜很多人用都沒事。', fb: '否定顧客的經驗，會讓她更生氣。', r: '你是說我說謊嗎？！' },
+          { q: 1, s: 'C1', t: '好的，退貨要有發票，請您拿到櫃檯辦理。', fb: '流程沒錯，但完全沒有處理她的情緒。', r: '就這樣？連一句抱歉都沒有？' },
+        ] },
+      { c: '我花了一千多塊耶，結果越擦越糟！', focus: 'AE', hint: '同理她的心疼，再溫和地了解使用方式與其他產品。', k: { A: ['同時', '其他', '新的', '哪裡'], E: ['理解', '心情'] },
+        o: [
+          { q: 2, s: 'A3E1', t: '一千多塊真的不便宜，我理解您的心情。為了找出原因，想請問這段時間有同時用其他新的產品嗎？像是酸類、去角質？乳霜是擦全臉還是比較乾的地方？', fb: '同理之後再問，問題具體又不帶指責，才問得出真正原因。', r: '我最近有開始用朋友推薦的果酸棉片…這有關係嗎？' },
+          { q: 1, s: 'A1', t: '那您有沒有用別的東西？', fb: '方向對，但語氣像在找顧客的錯。先同理，再問。', r: '你是說是我的問題囉？' },
+          { q: 0, s: 'E-2', t: '一定是您自己混用別的東西才會這樣。', fb: '還沒了解就下結論，等於把責任推給顧客。', r: '我要找你們主管！' },
+        ] },
+      { c: '所以是果酸的問題嗎？', focus: 'K', hint: '專業說明可能原因、不是她的錯，給具體建議並提醒就醫。', k: { K: ['果酸', '敏感', 'T 字', '暫停', '皮膚科'] },
+        o: [
+          { q: 2, s: 'K3E1', t: '有可能喔，果酸會讓肌膚比較敏感，加上乳霜比較滋潤，T 字部位就容易悶住。這不是您的錯，很多人都會遇到。建議先暫停果酸，乳霜晚上只擦兩頰較乾的地方。如果痘痘持續或發炎，還是要給皮膚科醫師看喔。', fb: '說明原因、不責怪、給具體做法並提醒就醫，專業又有溫度。', r: '原來是這樣…' },
+          { q: 1, s: 'K1', t: '應該是果酸的問題，跟我們的乳霜沒關係。', fb: '急著撇清責任，顧客會覺得你只想保護公司。', r: '所以你們都沒責任就對了。' },
+          { q: 0, s: 'K-1', x: 1, t: '那您繼續擦我們的乳霜，痘痘就會慢慢退了。', fb: '暗示產品能治痘是不正確也不合規的說法，而且可能讓情況更糟。', r: '真的嗎？可是現在越來越多…' },
+        ] },
+      { c: '那我還要退貨嗎？', focus: 'C', hint: '尊重她的決定，提供選擇，並主動約好關心。', k: { C: ['選擇', '換', '關心', 'LINE', '三天後'] },
+        o: [
+          { q: 2, s: 'C3E1', t: '我尊重您的決定。如果還是想退，我現在就依規定幫您辦理；如果想再試一次，我可以幫您換成清爽型的產品。不論哪一種，三天後我都會傳 LINE 關心您的皮膚狀況，好嗎？', fb: '給選擇權、承諾後續關心，客訴就有機會變成忠誠顧客。', r: '那我換清爽的試試看好了，謝謝你。' },
+          { q: 1, s: 'C1', t: '既然不是乳霜的問題，就不用退了吧。', fb: '替顧客做決定，她會覺得被說服而不是被尊重。', r: '我還是退好了。' },
+          { q: 0, s: 'C-1E-1', t: '已經開封了，原則上不能退喔。', fb: '用規定擋顧客會讓客訴升級。熟悉公司的退換貨規定，主動提供選擇。', r: '那我要客訴到總公司！' },
+        ] },
+    ],
+    end: { good: '吳小姐換了清爽型產品，三天後回報痘痘消了，還在社群上稱讚你的服務。', mid: '吳小姐辦了退貨，但對你的態度印象不差，未來還有機會。', bad: '吳小姐帶著怒氣離開，並在網路上留下負評。' } },
+
+  { id: 's9', title: '新客一週回訪', ch: 'LINE／線上', skill: '售後經營', lv: 1, products: ['serum', 'cream'],
+    p: { n: '鄭小姐', age: 30, av: '🙋🏻‍♀️', bg: '上週第一次買玻尿酸精華，加了你的 LINE。', mood: 60, need: '用得不錯但不確定用量；同事也在問她用什麼。' },
+    goal: '關心使用狀況、教正確用法，並自然帶出轉介紹與下次回購。',
+    turns: [
+      { c: '（LINE）嗨～怎麼了嗎？', focus: 'EA', hint: '回訪的重點是「使用感受」，不是新品。', k: { A: ['感覺', '還會', '怎麼樣'] },
+        o: [
+          { q: 2, s: 'E2A3', t: '嗨鄭小姐～上週您帶了玻尿酸精華，想關心一下用了一週感覺怎麼樣？上妝還會卡粉嗎？😊', fb: '具體提到她買的商品與原本的困擾，回訪就很有溫度。', r: '有比較好耶！' },
+          { q: 0, s: 'C-1', t: '我們這週有新品上市喔！要不要看看？', fb: '才買一週就推新品，會讓顧客覺得你只想賣東西。', r: '喔…先不用。' },
+          { q: 1, s: 'E1', t: '沒事～只是想跟您打聲招呼！', fb: '有溫度但沒有目的。回訪要問到使用感受才有價值。', r: '喔～嗨！' },
+        ] },
+      { c: '不過我不確定要擦多少，有時候擦太多會黏黏的。', focus: 'K', hint: '給具體用量、時機與步驟。', k: { K: ['1–2 滴', '微濕', '輕拍', '乳液'] },
+        o: [
+          { q: 2, s: 'K3', t: '有感覺就對了 👏 建議早上 1–2 滴就好，在化妝水後、趁臉還微濕時輕拍，吸收會更好；晚上比較乾可以 2–3 滴，再擦乳液鎖住。', fb: '具體的用量與步驟，讓顧客用得好、用得完，自然會回購。', r: '原來要趁微濕！' },
+          { q: 1, s: 'K1', t: '擦少一點就好。', fb: '給具體用量和步驟，顧客才會用得好。', r: '少一點是多少？' },
+          { q: 0, s: 'K-1', t: '黏是正常的，代表有在吸收。', fb: '不正確的說法，也沒解決她的問題。', r: '是喔…可是很不舒服。' },
+        ] },
+      { c: '對了，我同事看我氣色變好，也問我在用什麼。', focus: 'VC', hint: '讓顧客「有面子」、對方「沒壓力」，就是好的轉介紹。', k: { C: ['分享', '試用包', '寄'], V: ['謝謝'] },
+        o: [
+          { q: 2, s: 'V2C3', t: '哇～被同事稱讚很開心吧！歡迎您把我的 LINE 分享給她，我可以先寄試用包給她試試看，沒壓力。也謝謝您的推薦，下次您回購時我幫您準備一份小禮物 🎁', fb: '肯定顧客、給對方零壓力的入口，並感謝推薦者，轉介紹就會自然發生。', r: '好啊！我傳給她～' },
+          { q: 1, s: 'C1', t: '那您叫她來店裡找我。', fb: '門檻太高，對方不一定會來。', r: '好，我跟她說。' },
+          { q: 0, s: 'C-2', t: '那您幫我賣給她，我給您抽成！', fb: '讓顧客感覺被利用，也破壞了單純的信任。', r: '呃…不用了啦。' },
+        ] },
+      { c: '那我的精華大概什麼時候會用完？', focus: 'C', hint: '算出時間、約好提醒，順勢預告搭配。', k: { C: ['提醒', '一個月後'], V: ['搭配'] },
+        o: [
+          { q: 2, s: 'C3V1', t: '照您的用量，大約再一個半月。我在一個月後提醒您，到時如果想試試搭配的晚安修護乳霜，我再跟您介紹，好嗎？', fb: '主動掌握補貨時機，並預告下一個需求，經營就有節奏。', r: '好，到時候提醒我！' },
+          { q: 1, s: 'C1', t: '用完再跟我說就好。', fb: '把提醒的責任丟給顧客，容易流失。', r: '好喔。' },
+          { q: 0, s: 'C-1', t: '現在先買一瓶備用比較保險！', fb: '還有很多就推備用，會讓顧客覺得有壓力。', r: '我還有很多耶。' },
+        ] },
+    ],
+    end: { good: '鄭小姐的同事成為你的新顧客，一個月後鄭小姐也準時回購並加購乳霜。', mid: '鄭小姐用得不錯，但轉介紹沒有發生。下次可以給更簡單的分享方式。', bad: '鄭小姐覺得被推銷，之後很少回訊息。' } },
+
+  { id: 's10', title: '朋友問「你是不是在做直銷？」', ch: '到府／直銷', skill: '開場破冰', lv: 2, products: ['serum'],
+    p: { n: '小琪', age: 29, av: '👱🏻‍♀️', bg: '大學好友，最近常看到你發保養貼文。', mood: 45, need: '其實對保養有興趣，但怕被一直推銷、怕壞了友情。' },
+    goal: '坦誠面對、先保護關係，用真實分享與零壓力的試用建立信任。',
+    turns: [
+      { c: '欸，你最近一直發保養品的貼文，你是不是在做直銷啊？', focus: 'E', hint: '坦白、輕鬆、先保護關係。', k: { E: ['放心', '朋友', '不會一直'] },
+        o: [
+          { q: 2, s: 'E3', t: '哈哈對啊，我最近在當美容顧問，是我自己用了覺得不錯才開始的。你放心，我不會一直推銷你，朋友最重要啦！', fb: '坦白、輕鬆、先保護關係，對方的防衛心就會放下。', r: '哈哈好啦，那你自己用了覺得怎樣？' },
+          { q: 0, s: 'E-1', t: '不是直銷啦，是創業！你不要想得那麼負面。', fb: '急著否認或辯解，反而讓人更懷疑。', r: '…喔，好。' },
+          { q: 1, s: 'E1', t: '嗯…算是吧。', fb: '沒有說明讓對方安心，容易尷尬。', r: '（氣氛有點尷尬）' },
+        ] },
+      { c: '你自己用了覺得怎樣？', focus: 'KA', hint: '分享自己真實、具體的感受，再把話題轉回她身上。', k: { K: ['保濕', '精華'], A: ['你呢', '還會嗎'] },
+        o: [
+          { q: 2, s: 'K2A2', t: '我自己最有感的是保濕精華，以前下午臉會很乾，現在比較不會了。你呢？我記得你說過換季臉會脫皮，現在還會嗎？', fb: '具體的親身經驗最有說服力，再把焦點轉回朋友的需要。', r: '還是會耶，可是我之前買過很貴的也沒用。' },
+          { q: 1, s: 'K1', t: '很好用啊，每一款都很好！', fb: '太籠統，聽起來像推銷話術。', r: '每一款都好喔？' },
+          { q: 0, s: 'C-1E-1', t: '超好用的！你要不要也一起加入，可以賺外快！', fb: '朋友只是好奇，就直接邀請加入，會讓她立刻有壓力。', r: '呃…我先不要。' },
+        ] },
+      { c: '我之前買過很貴的也沒用。', focus: 'AV', hint: '同理、了解過去經驗，提出零壓力的試用。', k: { A: ['哪一種', '膚質'], V: ['試用', '沒關係'] },
+        o: [
+          { q: 2, s: 'A2V2', t: '我懂，買了沒用最心疼。你那時候用的是哪一種？有時候不是貴不貴，是適不適合膚質。我拿試用包給你，用用看再說，不喜歡也沒關係。', fb: '同理、探詢、提出零風險的試用，朋友就能安心嘗試。', r: '好啊，那你先給我試用包。' },
+          { q: 1, s: 'V1', t: '這個不一樣，這個真的有用。', fb: '沒有說明為什麼不一樣，說服力不足。', r: '每個都說自己不一樣…' },
+          { q: 0, s: 'V-1', x: 1, t: '我們的保證有效，沒效退費！', fb: '「保證有效」是絕對用語，不能說；退費條件也要依公司規定。', r: '保證？聽起來好像廣告。' },
+        ] },
+      { c: '好啊，那你先給我試用包好了。', focus: 'C', hint: '約好下次見面，邀請她誠實回饋。', k: { C: ['明天', '約', '三天'] },
+        o: [
+          { q: 2, s: 'C3E1', t: '好！我明天帶給你。用三天我們再約喝咖啡聊聊，好用再跟我說，不好用也要誠實跟我說喔 😄', fb: '約好時間、邀請真實回饋，朋友關係與信任都加分。', r: '好啊，喝咖啡！' },
+          { q: 1, s: 'C1', t: '好，我放你桌上。', fb: '少了約定下次互動的機會。', r: '好～' },
+          { q: 0, s: 'C-2', t: '試用包要配合買一瓶才有喔。', fb: '前面說零壓力、後面設條件，朋友會覺得被騙。', r: '那算了。' },
+        ] },
+    ],
+    end: { good: '小琪用了試用包很喜歡，成為你的固定顧客，還常在聚會幫你分享。', mid: '小琪收了試用包，但之後沒有下文。記得約好的咖啡要主動邀。', bad: '小琪之後看到你的貼文就滑過去了。' } },
+
+  { id: 's11', title: '「我再考慮看看」', ch: '門市', skill: '成交推進', lv: 2, products: ['cream', 'serum'],
+    p: { n: '許小姐', age: 38, av: '🧕🏻', bg: '已經試擦過乳霜，拿著看了很久。', mood: 50, need: '擔心混合肌擦乳霜太油，也覺得價格有點高。' },
+    goal: '找出「考慮」背後的真正原因，逐一化解，並在購買訊號出現時主動成交。',
+    turns: [
+      { c: '嗯…我再考慮看看好了。', focus: 'EA', hint: '「考慮看看」背後一定有原因，溫和地問出來。', k: { E: ['沒問題', '慎重'], A: ['價格', '效果', '適合'] },
+        o: [
+          { q: 2, s: 'E2A3', t: '當然沒問題，慎重一點是對的。想多了解一下，您比較想考慮的是價格、效果，還是適不適合自己？我可以幫您整理清楚。', fb: '尊重她的猶豫，再用選項式問題找出真正的顧慮。', r: '主要是…我怕會不會太油，我是混合肌。' },
+          { q: 0, s: 'C-2', t: '今天是最後一天優惠，明天就沒有了喔！', fb: '用急迫感施壓，顧客會不信任你；若真有期限，要誠實說明。', r: '那我還是改天好了。' },
+          { q: 1, s: 'E1', t: '好的，那您考慮好再來。', fb: '放棄了解原因，就失去成交的機會。', r: '好，謝謝。' },
+        ] },
+      { c: '我是混合肌，怕這個乳霜太油。', focus: 'K', hint: '提供正確的局部使用方法，並讓她再體驗一次。', k: { K: ['T 字', '兩頰', '局部', '眼周'], C: ['試擦'] },
+        o: [
+          { q: 2, s: 'K3A1', t: '很好的問題！這款晚安修護乳霜偏滋潤，混合肌建議只擦兩頰和眼周較乾的地方，T 字部位薄薄一層或跳過。要不要現在擦一點在下巴，感受一下吸收度？', fb: '用正確的使用方法解決顧慮，再邀請親身體驗。', r: '（試擦後）嗯，比我想的清爽。但 1,580 有點貴。' },
+          { q: 1, s: 'K1', t: '不會油啦，很多人用。', fb: '沒有針對她的膚質給建議。', r: '可是我是混合肌耶。' },
+          { q: 0, s: 'K-1', t: '混合肌不適合，那您就不要買乳霜了。', fb: '太快放棄。提供正確的用法就能解決她的顧慮。', r: '喔…好吧。' },
+        ] },
+      { c: '可是一瓶 1,580 有點貴。', focus: 'V', hint: '換算使用天數，說出「一瓶多用」的價值。', k: { V: ['一天', '三個月', '眼霜', '省'] },
+        o: [
+          { q: 2, s: 'V3', t: '我理解。這瓶 50ml，只擦乾的部位大約可以用三個月，一天大約 17 元。而且眼周也能用，不用再多買一瓶眼霜。', fb: '換算每日成本、點出一瓶多用，價格就變成價值。', r: '這樣算起來還好耶。' },
+          { q: 1, s: 'V1', t: '一分錢一分貨，這價格很合理。', fb: '沒有具體說明，說服力不足。', r: '合理是多合理？' },
+          { q: 0, s: 'C-1', t: '那我幫您打個折。', fb: '沒授權就降價，會打亂價格制度，也讓之前買的顧客不舒服。', r: '那可以再多折一點嗎？' },
+        ] },
+      { c: '好，聽起來還不錯。', focus: 'C', hint: '購買訊號出現了！主動提出成交，並約好追蹤。', k: { C: ['結帳', '兩週後', 'LINE'] },
+        o: [
+          { q: 2, s: 'C3', t: '那我幫您結帳？今天先帶乳霜就好，兩週後我傳 LINE 問您使用感覺。如果早上還想再加強保濕，到時再考慮搭配精華。', fb: '抓住購買訊號主動成交，並把加購留到下次，顧客毫無壓力。', r: '好，就先帶乳霜！' },
+          { q: 1, s: 'C1', t: '那您要不要再看看別的？', fb: '顧客已經準備好了，還岔開話題會錯過時機。', r: '嗯…我再想一下好了。' },
+          { q: 0, s: 'C-1', t: '要不要乾脆精華、乳霜、化妝水一起帶，整套比較有效。', fb: '在成交時刻追加太多，會讓剛下的決定動搖。', r: '這樣太多了，我再考慮…' },
+        ] },
+    ],
+    end: { good: '許小姐帶走了乳霜，兩週後回報很滿意，並加購了精華。', mid: '許小姐說會再來，記得留下聯絡方式並追蹤。', bad: '許小姐離開後就沒有再回來。' } },
+];
+
+const OBJECTIONS = [
+  { id: 'o1', type: '價格', c: '太貴了，我負擔不起。', tip: '同理 → 了解預算 → 換算每日成本或提供小容量／組合選擇。', model: '我懂，保養是長期的花費，要放在預算內才舒服。想請問您每個月保養大概抓多少？這瓶可以用兩個月，換算一天約 20 元；如果想先輕鬆開始，也有旅行組可以試。', k: { E: ['懂', '理解'], A: ['預算', '多少'], V: ['一天', '換算', '旅行組', '小容量'] } },
+  { id: 'o2', type: '價格', c: '網路上比較便宜。', tip: '肯定比價 → 說明正貨、效期、售後服務的價值 → 用合規的優惠回應，不貶低別人。', model: '比價很正常！我們這邊是公司貨，有完整中文標示和效期，用了有任何問題都能直接找我，我也會幫您留意補貨。這期還有贈品，算起來其實差不多。', k: { E: ['正常', '謝謝'], K: ['公司貨', '效期', '標示'], V: ['售後', '贈品', '安心'] } },
+  { id: 'o3', type: '猶豫', c: '我再考慮看看。', tip: '尊重 → 用選項式問題找出真正顧慮（價格／效果／適合度）→ 針對處理。', model: '當然沒問題，慎重一點是對的。方便跟我說您比較想考慮的是價格、效果，還是適不適合自己嗎？我幫您整理清楚，您再決定。', k: { E: ['沒問題', '慎重'], A: ['價格', '效果', '適合'] } },
+  { id: 'o4', type: '決策者', c: '我要回去問我先生。', tip: '肯定一起決定 → 了解家人可能在意的點 → 準備好給家人看的資訊或試用品。', model: '一起討論很好！您覺得先生最可能在意的是價格還是效果？我把重點和價格整理成一張小卡，也給您一份試用品，讓他也可以先試試看。', k: { E: ['很好', '一起'], A: ['在意', '哪'], C: ['小卡', '試用', '整理'] } },
+  { id: 'o5', type: '時間', c: '我現在很忙，沒空聽。', tip: '道歉 → 不硬講 → 用二選一約下次時間。', model: '不好意思打擾您！我不佔用您時間，請問今天晚上七點或明天中午，哪個時間方便我再打給您？大概兩分鐘就好。', k: { E: ['不好意思', '打擾'], C: ['還是', '幾點', '明天', '兩分鐘'] } },
+  { id: 'o6', type: '競品', c: '我已經有在用別的牌子了。', tip: '肯定她的選擇 → 了解滿意與不滿意的地方 → 從「補足」切入，而不是取代。', model: '很好呀，有固定在保養！想請問您現在用的有沒有哪裡覺得還可以更好？例如保濕夠不夠、會不會黏？我們的精華很多人是拿來搭配原本的保養一起用。', k: { E: ['很好'], A: ['哪裡', '滿意', '更好'], V: ['搭配', '補足'] } },
+  { id: 'o7', type: '風險', c: '我皮膚很敏感，怕過敏。', tip: '同理 → 了解過去經驗 → 說明成分與測試（不說保證）→ 教局部試用。', model: '會擔心很正常。想請問您之前是對什麼比較容易不舒服嗎？這款是無酒精、無香精，也通過敏感肌測試，不過每個人膚況不同，建議先在耳後擦三天看看，我給您試用品。', k: { E: ['擔心', '正常'], A: ['之前', '什麼'], K: ['無酒精', '無香精', '敏感肌測試', '耳後', '局部'] } },
+  { id: 'o8', type: '信任', c: '我之前買過很貴的，也沒什麼用。', tip: '同理心疼 → 了解過去產品與使用方式 → 用適合度與試用重建信任。', model: '買了沒效果真的很心疼。想請問您之前用的是哪一類？用了多久？有時候不是產品不好，而是不適合您的膚質。我們先從試用開始，有感覺再說，好嗎？', k: { E: ['心疼', '懂'], A: ['哪一類', '多久'], C: ['試用'] } },
+  { id: 'o9', type: '信任', c: '你們是不是直銷？會不會一直跟我推銷？', tip: '坦白 → 承諾不打擾 → 讓對方掌握節奏。', model: '我是美容顧問沒錯～您放心，我不會一直推銷，您有需要或想問保養問題再找我就好。今天也可以先試用看看，不買也沒關係。', k: { E: ['放心', '沒關係', '不會一直'], C: ['試用'] } },
+  { id: 'o10', type: '需求', c: '家裡還有很多沒用完。', tip: '肯定惜物 → 了解現有產品 → 教搭配或約好用完時提醒。', model: '很棒，用完再買最好！方便跟我說家裡還有哪些嗎？我可以幫您看看怎麼搭配用比較有效；等快用完時我再提醒您，好嗎？', k: { E: ['很棒'], A: ['哪些'], C: ['提醒', '快用完'] } },
+  { id: 'o11', type: '需求', c: '我不需要啦。', tip: '不爭辯 → 好奇地了解目前狀況 → 留下關係。', model: '好的，沒關係！想跟您請教一下，您現在保養上有沒有哪個小困擾，例如乾、出油或上妝不服貼？如果沒有也很好，那我留個 LINE，有新的保養小知識再分享給您。', k: { E: ['沒關係', '好的'], A: ['困擾', '有沒有'], C: ['LINE', '分享'] } },
+  { id: 'o12', type: '效果', c: '這個真的有效嗎？', tip: '不保證 → 說明成分與適用對象 → 分享多數使用者回饋 → 邀請試用。', model: '這是很好的問題。效果會因膚況不同，我不敢跟您保證；這款主要成分是玻尿酸和維他命 B5，很多換季乾燥的顧客回饋上妝比較服貼。您可以先試用三天，自己感受最準。', k: { E: ['好問題'], K: ['成分', '玻尿酸', '因膚況', '因人而異'], C: ['試用', '三天'] } },
+];
+
+const FLOW = [
+  { s: '迎', n: '迎接與破冰', goal: '讓顧客放下防衛，願意多聊一句。',
+    do: ['微笑、眼神接觸，先讓顧客自在看', '用季節、天氣或顧客手上的商品開話題', 'TM／LINE：自我介紹＋來意＋時間＋徵求同意'],
+    dont: ['一開口就推促銷', '緊跟在顧客身後', '問「需要幫忙嗎？」（容易得到「不用」）'],
+    say: ['「您慢慢看～最近換季，很多人都在找保濕的。」', '「王小姐您好，我是〇〇的小美，想花一分鐘關心防曬使用狀況，現在方便嗎？」'] },
+  { s: '探', n: '需求探詢', goal: '了解膚況、習慣、預算、用途，以及「真正的擔心」。',
+    do: ['問好回答的開放式問題', '用「所以您最在意的是…對嗎？」確認需求', '記下關鍵字（乾、卡粉、敏感、送禮）'],
+    dont: ['連珠炮式提問', '問完不聽，直接介紹產品', '用指責語氣（「你一定沒擦乳液」）'],
+    say: ['「您早晚的保養大概有哪些步驟？」', '「您比較在意的是價格、效果，還是適不適合自己？」'] },
+  { s: '薦', n: '個人化推薦', goal: '只推 1–2 個最適合的選擇，並說出「對您的好處」。',
+    do: ['用 FAB：特色 → 優點 → 對顧客的好處', '連結顧客剛說的情境', '換算使用天數、每天成本', '邀請試擦、試用'],
+    dont: ['一次推整套', '只念成分', '使用誇大或療效用語'],
+    say: ['「這瓶質地清爽、吸收快，上妝前用，妝會比較服貼，一瓶可以用兩個月。」'] },
+  { s: '解', n: '異議處理（LSCPA）', goal: '把「不要」變成「說說看」。',
+    do: ['L 聆聽：讓顧客說完', 'S 同理：「會擔心很正常」', 'C 釐清：「您擔心的是…？」', 'P 提出方案：試用、換算、搭配', 'A 詢問：「這樣您覺得可以嗎？」'],
+    dont: ['打斷、辯解、否定顧客經驗', '貶低競品或網路賣家', '未經授權私下降價'],
+    say: ['「我懂，300 元不是小數目。換算下來一天不到 5 元，而且有人幫您顧售後。」'] },
+  { s: '成', n: '成交推進', goal: '看到購買訊號就主動、溫和地提出下一步。',
+    do: ['留意訊號：問價格、問用法、問贈品、說「還不錯」', '二選一：「先帶乳霜，還是精華一起？」', '給零風險選擇：試用、小容量、換貨說明'],
+    dont: ['假的急迫感（「今天最後一天」）', '成交時才追加整套', '把流程丟回給顧客（「您再上網買」）'],
+    say: ['「那我幫您結帳？兩週後我傳 LINE 問您使用感覺。」'] },
+  { s: '續', n: '售後經營', goal: '讓一次購買變成長期關係與轉介紹。',
+    do: ['3 天內關心使用感受', '依使用週期提醒補貨', '感謝並簡化轉介紹（分享 LINE、寄試用包）'],
+    dont: ['才買一週就推新品', '轉介紹談抽成', '只在有活動時才聯絡'],
+    say: ['「用了一週感覺怎麼樣？上妝還會卡粉嗎？」', '「歡迎把我的 LINE 分享給同事，我先寄試用包給她。」'] },
+];
+
+const CHANNEL_TIPS = [
+  { ch: '門市', i: '🏬', tips: ['顧客進店先給 10 秒空間', '多用試擦、試香，讓產品自己說話', '結帳時約好追蹤方式（LINE）'] },
+  { ch: 'TM 電話', i: '📞', tips: ['開場 15 秒內說完：我是誰、為什麼打、要多久、方便嗎', '聲音要帶微笑，語速放慢', '對方忙就二選一約時間，不硬講'] },
+  { ch: 'LINE／線上', i: '💬', tips: ['一則訊息只講一件事，三行以內', '先關心再提案，善用貼圖拉近距離', '購買訊號出現就立刻給連結與出貨時間'] },
+  { ch: '到府／直銷', i: '🏠', tips: ['先顧關係，再談產品', '分享自己真實的使用經驗', '保健食品務必合規說明，不碰療效'] },
+  { ch: '客服', i: '🎧', tips: ['先處理心情，再處理事情', '不否定顧客經驗，不急著撇清', '提供選擇，並承諾後續追蹤'] },
+];
+
+const COMPLIANCE = [
+  ['保證有效、一定有效、100% 有效', '多數使用者回饋…／效果因個人膚況而異'],
+  ['治療、治癒、改善〇〇症狀', '日常保養、幫助維持…'],
+  ['保證不會過敏', '通過敏感肌測試，建議先局部試用'],
+  ['吃了不用看醫生、可以取代藥', '保健食品不能取代醫療，身體不適請先就醫'],
+  ['凍齡、逆齡、回春', '幫助維持好氣色、肌膚看起來更有光澤'],
+  ['永久、根治、立刻見效', '持續使用，感受會更明顯'],
+  ['最便宜、全台最低價', '這期有優惠／贈品'],
+  ['吃越多越好', '請依標示建議量食用'],
+  ['減肥、瘦身、燃脂（食品）', '搭配均衡飲食與規律運動'],
+];
+const BANNED = /保證|一定有效|百分之百|100\s*%|治療|治癒|根治|療效|藥效|取代藥|不用看醫生|不用去看醫生|永久|凍齡|逆齡|回春|不會過敏|最便宜|全台最低|無副作用|立刻見效|燃脂|瘦身|減肥|吃越多越好/;
+
+const ROLES = ['銷售新人', '門市人員', 'TM 電話', '直銷／美容顧問', '客服人員', '講師／主管'];
+
+/* =====================================================================
+   狀態與工具
+   ===================================================================== */
+const KEY = 'ssc-state';
+const params = new URLSearchParams(location.search);
+const demo = params.get('demo');
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+const today = () => dayKey(Date.now());
+const shuffle = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const pctClass = v => v == null ? 's-none' : v >= 80 ? 's-good' : v >= 60 ? 's-mid' : 's-bad';
+
+const blank = () => ({ profile: { name: '', role: '', onboarded: false, autoSpeak: false, big: false, theme: 'auto' }, sessions: [], drills: [], quizzes: [], customScen: [], customProd: [] });
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.profile) return { ...blank(), ...s, profile: { ...blank().profile, ...s.profile } }; } catch (e) { /* 無法讀取時用空白資料 */ }
+  return blank();
+}
+let state = blank();
+function save() { if (demo) return; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { toast('裝置空間不足，資料可能沒有儲存'); } }
+
+const allProducts = () => [...PRODUCTS, ...state.customProd];
+const prod = id => allProducts().find(p => p.id === id);
+const allScen = () => [...SCENARIOS, ...state.customScen];
+const scen = id => allScen().find(s => s.id === id);
+const parseS = s => { const o = {}; String(s || '').replace(/([EAKVC])(-?\d)/g, (_, k, v) => { o[k] = (o[k] || 0) + Number(v); }); return o; };
+const best = sid => { const xs = state.sessions.filter(x => x.sid === sid); return xs.length ? Math.max(...xs.map(x => x.score)) : null; };
+
+let toastTimer;
+function toast(msg, btn, fn) {
+  $('#toastMsg').textContent = msg;
+  const b = $('#toastBtn'); b.textContent = btn || ''; b.style.display = btn ? '' : 'none'; b.onclick = () => { $('#toast').classList.remove('show'); fn && fn(); };
+  $('#toast').classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('show'), btn ? 7000 : 2600);
+}
+function openSheet(title, html) {
+  $('#sheetBody').innerHTML = `<div class="shead"><h2>${title}</h2><button class="icon-btn" data-act="close-sheet" aria-label="關閉">✕</button></div>${html}`;
+  $('#sheet').classList.add('open'); $('#sheet').setAttribute('aria-hidden', 'false'); $('#sheet .pane').scrollTop = 0;
+}
+function closeSheet() { $('#sheet').classList.remove('open'); $('#sheet').setAttribute('aria-hidden', 'true'); }
+async function copyText(t, msg = '已複製') {
+  try { await navigator.clipboard.writeText(t); toast(msg); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(msg); }
+}
+function shareText(t) {
+  if (navigator.share) navigator.share({ text: t }).catch(() => {});
+  else window.open('https://line.me/R/share?text=' + encodeURIComponent(t), '_blank', 'noopener');
+}
+function download(name, text, type = 'application/json') {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ---------- 語音：朗讀顧客台詞、用說的回答 ---------- */
+const canSpeak = 'speechSynthesis' in window;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function speak(text) {
+  if (!canSpeak) return;
+  const clean = String(text).replace(/（[^）]*）|\([^)]*\)/g, '').replace(/[〇]/g, '').trim();
+  if (!clean) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(clean); u.lang = 'zh-TW'; u.rate = 1;
+  const v = speechSynthesis.getVoices().find(v => /zh[-_]TW/i.test(v.lang)); if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+let rec = null;
+function listen(target, btn) {
+  if (!SR) return toast('這個瀏覽器不支援語音輸入，可以用鍵盤的麥克風輸入');
+  if (rec) { rec.stop(); return; }
+  rec = new SR(); rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = false;
+  const base = target.value;
+  rec.onresult = e => { target.value = base + [...e.results].map(r => r[0].transcript).join(''); };
+  rec.onend = () => { rec = null; btn.textContent = '🎤'; btn.setAttribute('aria-pressed', 'false'); };
+  rec.onerror = () => toast('沒有聽清楚，請再試一次');
+  btn.textContent = '⏹'; btn.setAttribute('aria-pressed', 'true'); rec.start();
+}
+
+/* =====================================================================
+   教練評分引擎：把自由回答換算成五個面向的分數
+   ===================================================================== */
+const RX = {
+  E: /了解|理解|明白|我懂|懂您|懂你|辛苦|謝謝|感謝|抱歉|不好意思|擔心|很正常|沒關係|放心|心疼|難怪|不舒服|困擾|貼心|很好的問題|好問題|尊重|您慢慢|你慢慢/g,
+  A: /[？?]|請問|想了解|想問|方便|平常|是不是|哪[一些個種裡]|什麼|怎麼樣|多久|多少|有沒有|會不會|比較在意|對嗎/g,
+  V: /幫您|幫你|讓您|讓你|省|划算|一天|換算|平均|可以用|好處|適合您|適合你|安心|感受|服貼|方便|不用再|一瓶多用|贈品/g,
+  C: /試試|試用|試擦|試香|要不要|幫您|幫你|預約|下次|LINE|line|留個|登記|安排|約|提醒|結帳|包起來|寄|保留|連結|三天後|兩週後|一個月後/g,
+  K_GEN: /\d+\s*(ml|滴|天|次|包|錠|小時|個月)|早晚|早上|晚上|步驟|成分|質地|吸收|局部|耳後|補擦|依標示|醫師|醫生|就醫/g,
+  PUSH: /買一送一|最後一天|今天買|現在買|整套|一定要買|不買會後悔/,
+  BLAME: /不可能|您應該是|你應該是|一定是您|一定是你|你自己|您自己.*才|怎麼會這樣都/,
+};
+const NEG = /不能|不可|無法|不是|不敢|沒辦法|並非|不應|不會說|不要說/;
+function bannedHit(t) {
+  const re = new RegExp(BANNED.source, 'g'); let m;
+  while ((m = re.exec(t))) { if (!NEG.test(t.slice(Math.max(0, m.index - 4), m.index))) return m[0]; }
+  return '';
+}
+const cnt = (re, t) => (t.match(re) || []).length;
+const hits = (list, t) => (list || []).filter(w => t.includes(w)).length;
+function scoreText(text, turn, sc) {
+  const t = text.trim(); const s = { E: 0, A: 0, K: 0, V: 0, C: 0 }; const notes = [];
+  const k = turn.k || {};
+  const prodKeys = (sc.products || []).flatMap(id => (prod(id) || {}).keys || []);
+  const e = cnt(RX.E, t) + hits(k.E, t); s.E = e >= 2 ? 3 : e ? 2 : 0;
+  const a = cnt(RX.A, t) + hits(k.A, t); s.A = a >= 2 ? 3 : a ? 2 : 0;
+  const kk = hits(prodKeys, t) + hits(k.K, t) + Math.min(1, cnt(RX.K_GEN, t)); s.K = Math.min(3, kk);
+  const v = cnt(RX.V, t) + hits(k.V, t); s.V = v >= 2 ? 3 : v ? 2 : 0;
+  const c = cnt(RX.C, t) + hits(k.C, t); s.C = c >= 2 ? 3 : c ? 2 : 0;
+  let x = 0;
+  const bad = bannedHit(t);
+  if (bad) { x = 1; notes.push(`⚠️ 出現誇大或療效用語「${bad}」，請改用合規說法（見「流程」分頁的合規用語對照）。`); }
+  if (RX.BLAME.test(t)) { s.E = Math.max(-2, s.E - 3); notes.push('語氣像在否定或指責顧客，先接住感受再說明。'); }
+  if (RX.PUSH.test(t) && /[EA]/.test(turn.focus)) { s.C -= 2; s.E -= 1; notes.push('這時候推促銷或成交太早，顧客會有壓力。'); }
+  if (t.length < 10) { for (const d in s) s[d] = Math.min(s[d], 1); notes.push('回答有點短，多說一句會更有溫度。'); }
+  if (t.length > 160) notes.push('有點長，顧客可能聽不完；試著濃縮成 2–3 句。');
+  const fd = turn.focus.split('');
+  const avg = fd.reduce((n, d) => n + Math.max(0, s[d]), 0) / fd.length;
+  let q = avg >= 2.2 ? 2 : avg >= 1.2 ? 1 : 0;
+  if (x) q = 0;
+  const good = fd.filter(d => s[d] >= 2).map(d => DIM[d].n);
+  const weak = fd.filter(d => s[d] < 2);
+  return { s, q, x, notes, good, weak };
+}
+
+/* =====================================================================
+   練習流程
+   ===================================================================== */
+let play = null; // { sc, ti, mood, earned, max, log, x, mode, picks }
+const moodFace = m => m >= 75 ? '😊' : m >= 55 ? '🙂' : m >= 35 ? '😐' : m >= 15 ? '😕' : '😠';
+const moodColor = m => m >= 60 ? 'var(--ok)' : m >= 35 ? 'var(--mid)' : 'var(--bad)';
+
+function maxFor(turn) {
+  const m = { E: 0, A: 0, K: 0, V: 0, C: 0 };
+  // 滿分以「最佳回答」示範到的面向為準，普通選項碰巧得分的面向不另計
+  if (turn.o && turn.o.length) for (const o of turn.o.filter(o => o.q === 2)) { const s = parseS(o.s); for (const d in s) m[d] = Math.max(m[d], s[d]); }
+  else for (const d of turn.focus) m[d] = 3;
+  return m;
+}
+function startPlay(id) {
+  const sc = scen(id); if (!sc) return go('practice');
+  play = { sc, ti: 0, mood: sc.p.mood ?? 50, earned: { E: 0, A: 0, K: 0, V: 0, C: 0 }, max: { E: 0, A: 0, K: 0, V: 0, C: 0 }, log: [], x: 0, picks: [], textMode: !(sc.turns[0].o || []).length, done: false };
+  play.log.push({ t: 'sys', v: `${sc.ch}｜${sc.skill}` });
+  play.log.push({ t: 'c', v: sc.turns[0].c });
+  location.hash = 'play/' + id;
+  if (state.profile.autoSpeak) speak(sc.turns[0].c);
+}
+function answer(opt, text) {
+  const sc = play.sc, turn = sc.turns[play.ti];
+  const m = maxFor(turn); for (const d in m) play.max[d] += m[d];
+  let q, s, x, fb, reply, bestT = (turn.o || []).find(o => o.q === 2);
+  if (opt) {
+    ({ q } = opt); s = parseS(opt.s); x = opt.x ? 1 : 0; fb = opt.fb; reply = opt.r;
+    play.log.push({ t: 'm', v: opt.t });
+  } else {
+    const r = scoreText(text, turn, sc); ({ q, s, x } = r);
+    const parts = [];
+    if (r.good.length) parts.push('👍 做得好：' + r.good.join('、') + '。');
+    for (const d of r.weak) parts.push('💡 ' + DIM[d].n + '：' + DIM[d].tip);
+    parts.push(...r.notes);
+    fb = parts.join('\n');
+    const same = (turn.o || []).find(o => o.q === q);
+    reply = same ? same.r : (q === 2 ? '嗯，你說得有道理。' : q === 1 ? '喔…這樣啊。' : '…我不太懂你的意思。');
+    play.log.push({ t: 'm', v: text });
+  }
+  for (const d in s) play.earned[d] += Math.min(s[d], m[d]);
+  play.x += x;
+  const delta = (q === 2 ? 15 : q === 1 ? 3 : -15) - (x ? 15 : 0);
+  play.mood = Math.max(0, Math.min(100, play.mood + delta));
+  play.picks.push({ ti: play.ti, q, x, text: opt ? opt.t : text });
+  const label = q === 2 ? '✅ 很棒' : q === 1 ? '🟡 還可以更好' : '🔴 要調整';
+  const dimsTxt = Object.entries(s).filter(([, v]) => v).map(([d, v]) => `${DIM[d].i}${DIM[d].n} ${v > 0 ? '+' : ''}${v}`).join('　');
+  let kv = `${label}${x ? '　⚠️ 合規風險' : ''}\n${fb}`;
+  if (dimsTxt) kv += `\n${dimsTxt}`;
+  if (!opt && bestT) kv += `\n\n📝 參考說法：${bestT.t}`;
+  play.log.push({ t: 'k', v: kv, q });
+  play.log.push({ t: 'c', v: reply });
+  play.ti++;
+  if (play.mood <= 5 && play.ti < sc.turns.length) { play.log.push({ t: 'sys', v: '顧客失去耐心，對話提早結束了' }); return finish(); }
+  if (play.ti >= sc.turns.length) return finish();
+  play.log.push({ t: 'c', v: sc.turns[play.ti].c });
+  if (!(sc.turns[play.ti].o || []).length) play.textMode = true;
+  renderPlay();
+  if (state.profile.autoSpeak) speak(reply + '。' + sc.turns[play.ti].c);
+}
+function computeScore(p) {
+  const dims = {}; let sum = 0, n = 0;
+  for (const d of DIMS) { if (p.max[d.k] > 0) { dims[d.k] = Math.max(0, Math.min(1, p.earned[d.k] / p.max[d.k])); sum += dims[d.k]; n++; } }
+  let score = n ? Math.round(sum / n * 100) : 0;
+  score = Math.max(0, score - p.x * 10);
+  return { dims, score };
+}
+function finish() {
+  const { dims, score } = computeScore(play);
+  play.done = true; play.result = { dims, score };
+  if (!play.saved) {
+    state.sessions.push({ id: uid(), sid: play.sc.id, title: play.sc.title, ch: play.sc.ch, at: new Date().toISOString(), score, dims, mood: play.mood, x: play.x, mode: play.picks.some((p, i) => !(play.sc.turns[p.ti].o || []).some(o => o.t === p.text)) ? 'text' : 'choice' });
+    play.saved = true; save();
+  }
+  renderPlay();
+  setTimeout(() => { const r = $('#result'); r && r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
+}
+
+function renderPlay() {
+  const sc = play.sc;
+  document.body.classList.add('playing');
+  $('#title').textContent = sc.title;
+  const turn = sc.turns[play.ti];
+  const log = play.log.map(l => {
+    if (l.t === 'sys') return `<div class="msg sys">${esc(l.v)}</div>`;
+    if (l.t === 'c') return `<div class="msg c"><span class="who">${esc(sc.p.av)} ${esc(sc.p.n)}${canSpeak ? `<button class="say" data-act="say" data-t="${esc(l.v)}" aria-label="朗讀">🔊</button>` : ''}</span>${esc(l.v)}</div>`;
+    if (l.t === 'm') return `<div class="msg m"><span class="who">我</span>${esc(l.v)}</div>`;
+    return `<div class="msg k q${l.q}"><span class="who">🧑‍🏫 教練</span>${esc(l.v)}</div>`;
+  }).join('');
+  let bottom = '';
+  if (!play.done && turn) {
+    const opts = turn.o && turn.o.length ? (play.order && play.order.ti === play.ti ? play.order.list : (play.order = { ti: play.ti, list: shuffle(turn.o) }).list) : [];
+    const textBox = `<div class="row" style="align-items:flex-end"><textarea id="ans" rows="3" placeholder="像真的面對顧客一樣，把你會說的話打出來…" class="grow"></textarea></div>
+      <div class="row" style="margin-top:6px">${SR ? `<button class="btn sm" data-act="mic" aria-pressed="false" aria-label="用說的">🎤</button>` : ''}<span class="small muted grow">${SR ? '可以按 🎤 用說的' : ''}</span><button class="btn sm primary" data-act="send">送出</button></div>`;
+    bottom = `<div class="composer">
+      <div class="row small"><span class="grow muted">第 ${play.ti + 1}／${sc.turns.length} 回合　重點：${turn.focus.split('').map(d => DIM[d].i + DIM[d].n).join('、')}</span><button class="btn sm ghost" data-act="hint">💡 提示</button></div>
+      <div id="hintBox"></div>
+      ${opts.length && !play.textMode ? opts.map((o, i) => `<button class="opt" data-act="pick" data-i="${turn.o.indexOf(o)}"><b>${'ABC'[i]}</b>${esc(o.t)}</button>`).join('') + `<button class="btn sm ghost block" data-act="text-mode">✍️ 我想自己說說看</button>`
+        : textBox + (opts.length ? `<button class="btn sm ghost block" data-act="choice-mode" style="margin-top:4px">🔤 改用選項作答</button>` : '')}
+    </div>`;
+  }
+  let result = '';
+  if (play.done) {
+    const { dims, score } = play.result; const m = play.mood;
+    const endTxt = m >= 65 ? sc.end.good : m >= 35 ? sc.end.mid : sc.end.bad;
+    const grade = score >= 90 ? '金牌表現！可以當示範了 🏆' : score >= 75 ? '很不錯，再精進一兩個細節 👏' : score >= 60 ? '有基礎了，照教練建議再練一次 💪' : '先看看參考說法，再挑戰一次 🌱';
+    const weakest = Object.entries(dims).sort((a, b) => a[1] - b[1])[0];
+    result = `<div id="result" class="card">
+      <div class="center">${ring(score)}<h2 style="margin:6px 0 2px">${grade}</h2><p class="muted small">顧客心情 ${moodFace(m)} ${m}　${play.x ? `｜⚠️ 合規風險 ${play.x} 次（每次扣 10 分）` : '｜✅ 全程合規'}</p></div>
+      <div class="quote">📖 ${esc(endTxt || '練習完成！')}</div>
+      <h3>五力表現</h3>${DIMS.filter(d => d.k in dims).map(d => dimRow(d, dims[d.k])).join('')}
+      ${weakest ? `<p class="small">💡 <b>下一步練習：</b>${DIM[weakest[0]].n} — ${DIM[weakest[0]].tip}</p>` : ''}
+      <details class="acc" style="margin-top:10px"><summary>🔓 顧客的內心話</summary><div class="body">${esc(sc.p.need)}</div></details>
+      ${sc.turns.some(t => t.o) ? `<details class="acc"><summary>📝 每回合參考說法</summary><div class="body">${sc.turns.map((t, i) => { const b = (t.o || []).find(o => o.q === 2); return b ? `<p class="small muted">第 ${i + 1} 回合｜顧客：${esc(t.c)}</p><div class="quote">${esc(b.t)}</div>` : ''; }).join('')}</div></details>` : ''}
+      <div class="row wrap" style="margin-top:12px">
+        <button class="btn primary grow" data-act="replay">🔁 再練一次</button>
+        <button class="btn grow" data-act="next-rec">➡️ 下一個推薦</button>
+      </div>
+      <div class="row wrap" style="margin-top:8px">
+        <button class="btn sm grow" data-act="share-result">📤 分享成績</button>
+        <button class="btn sm grow" data-act="ai-prompt" data-id="${sc.id}">🤖 找 AI 自由對練</button>
+      </div>
+    </div>`;
+  }
+  $('#view').innerHTML = `
+    <div class="card">
+      <div class="persona"><div class="av">${esc(sc.p.av)}</div><div class="grow"><b>${esc(sc.p.n)}</b>　<span class="small muted">${sc.p.age ? sc.p.age + ' 歲' : ''}</span><br><span class="small">${esc(sc.p.bg)}</span></div></div>
+      <p class="small" style="margin-top:8px">🎯 <b>練習目標：</b>${esc(sc.goal)}</p>
+      <div class="mood"><span>${moodFace(play.mood)} 顧客心情</span><div class="bar"><i style="width:${play.mood}%;background:${moodColor(play.mood)}"></i></div><b>${play.mood}</b></div>
+    </div>
+    <div class="chat" id="chat">${log}</div>
+    ${result}${bottom}`;
+  if (!play.done) { const ch = $('#chat'); const last = ch.lastElementChild; last && last.scrollIntoView({ block: 'nearest' }); }
+}
+function ring(v) {
+  const r = 54, c = 2 * Math.PI * r, col = v >= 80 ? 'var(--ok)' : v >= 60 ? 'var(--mid)' : 'var(--bad)';
+  return `<svg class="ring" viewBox="0 0 132 132" role="img" aria-label="總分 ${v}"><circle cx="66" cy="66" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="12"/><circle cx="66" cy="66" r="${r}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c * v / 100} ${c}" transform="rotate(-90 66 66)"/><text x="66" y="74" text-anchor="middle" font-size="34" font-weight="800" fill="var(--text)">${v}</text></svg>`;
+}
+const dimRow = (d, v) => `<div class="dimrow"><span class="name">${d.i} ${d.n}</span><span class="bar"><i style="width:${Math.round(v * 100)}%"></i></span><span class="v">${Math.round(v * 100)}</span></div>`;
+
+/* =====================================================================
+   推薦、統計、徽章
+   ===================================================================== */
+function dimAverages() {
+  const acc = {}; const n = {};
+  for (const s of state.sessions.slice(-20)) for (const d in s.dims) { acc[d] = (acc[d] || 0) + s.dims[d]; n[d] = (n[d] || 0) + 1; }
+  const out = {}; for (const d of DIMS) out[d.k] = n[d.k] ? acc[d.k] / n[d.k] : null; return out;
+}
+function recommend() {
+  const av = dimAverages();
+  const known = DIMS.filter(d => av[d.k] != null).sort((a, b) => av[a.k] - av[b.k]);
+  const weak = known.length ? known[0].k : null;
+  const role = state.profile.role;
+  const prefer = role === 'TM 電話' ? 'TM 電話' : role === '門市人員' ? '門市' : role === '客服人員' ? '客服' : role === '直銷／美容顧問' ? '到府／直銷' : null;
+  const cands = SCENARIOS.map(s => {
+    const b = best(s.id); let pts = 0;
+    if (b == null) pts += 30; else if (b < 80) pts += 20 - b / 10; else pts -= 30;
+    if (weak) pts += s.turns.filter(t => t.focus.includes(weak)).length * 6;
+    if (prefer && s.ch === prefer) pts += 12;
+    if (!state.sessions.length) pts -= s.lv * 8;
+    return { s, pts };
+  }).sort((a, b) => b.pts - a.pts);
+  return { s: cands[0].s, weak };
+}
+function streak() {
+  const days = new Set([...state.sessions, ...state.drills].map(x => dayKey(x.at)));
+  let n = 0; const d = new Date();
+  if (!days.has(dayKey(d))) d.setDate(d.getDate() - 1);
+  while (days.has(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function badges() {
+  const S = state.sessions;
+  const chs = new Set(S.map(s => s.ch));
+  const objIds = SCENARIOS.filter(s => s.skill === '異議處理').map(s => s.id);
+  const lastTen = S.slice(-10);
+  return [
+    { i: '🌱', n: '第一次練習', on: S.length >= 1 },
+    { i: '🔥', n: '連續 3 天', on: streak() >= 3 },
+    { i: '🏆', n: '90 分以上', on: S.some(s => s.score >= 90) },
+    { i: '🧭', n: '走遍 5 種通路', on: CHANNELS.every(c => chs.has(c)) },
+    { i: '🛡️', n: '異議處理達人', on: objIds.every(id => (best(id) || 0) >= 80) },
+    { i: '⚖️', n: '合規守門員', on: lastTen.length >= 10 && lastTen.every(s => !s.x) },
+    { i: '⚡', n: '快問快答 10 題', on: state.drills.length >= 10 },
+    { i: '📚', n: '知識測驗全對', on: state.quizzes.some(q => q.right === q.total) },
+    { i: '🎓', n: '完成全部情境', on: SCENARIOS.every(s => best(s.id) != null) },
+  ];
+}
+
+/* =====================================================================
+   畫面：練習
+   ===================================================================== */
+let filt = { ch: '全部', skill: '全部' };
+function renderPractice() {
+  const name = state.profile.name;
+  const { s: rec, weak } = recommend();
+  const hr = new Date().getHours();
+  const hi = hr < 11 ? '早安' : hr < 18 ? '午安' : '晚安';
+  const list = SCENARIOS.filter(s => (filt.ch === '全部' || s.ch === filt.ch) && (filt.skill === '全部' || s.skill === filt.skill));
+  $('#view').innerHTML = `
+    ${installBanner()}
+    <div class="card hero">
+      <div class="small muted">${hi}${name ? '，' + esc(name) : ''}！今天的推薦練習${weak ? `（加強 ${DIM[weak].n}）` : ''}</div>
+      <div class="row" style="margin-top:8px"><div class="av" style="background:rgba(255,255,255,.2)">${rec.p.av}</div><div class="grow"><b style="font-size:1.1rem">${esc(rec.title)}</b><br><span class="small muted">${rec.ch}｜${rec.skill}｜約 3 分鐘</span></div></div>
+      <button class="btn block" style="margin-top:12px" data-act="play" data-id="${rec.id}">▶ 開始練習</button>
+    </div>
+    <div class="row">
+      <button class="btn grow" data-act="drill">⚡ 快問快答</button>
+      <button class="btn grow" data-act="ai-prompt" data-id="">🤖 AI 自由對練</button>
+    </div>
+    <h2>情境練習</h2>
+    <div class="chips" role="group" aria-label="通路">${['全部', ...CHANNELS].map(c => `<button class="chip" data-act="f-ch" data-v="${c}" aria-pressed="${filt.ch === c}">${c}</button>`).join('')}</div>
+    <div class="chips" role="group" aria-label="技巧">${['全部', ...SKILLS].map(c => `<button class="chip" data-act="f-skill" data-v="${c}" aria-pressed="${filt.skill === c}">${c}</button>`).join('')}</div>
+    ${list.map(scenCard).join('') || '<p class="muted">沒有符合的情境，換個篩選看看。</p>'}
+    <h2>我的自訂情境</h2>
+    <p class="small muted">把門市、電話裡真實遇過的顧客寫成練習題，讓團隊一起練。</p>
+    ${state.customScen.map(scenCard).join('')}
+    <button class="btn block" data-act="new-scen">＋ 建立自訂情境</button>`;
+}
+function scenCard(s) {
+  const b = best(s.id);
+  return `<button class="scen" data-act="play" data-id="${s.id}"><div class="av">${esc(s.p.av)}</div><div class="grow"><b>${esc(s.title)}</b><br><span class="tag b">${esc(s.ch)}</span><span class="tag a">${esc(s.skill)}</span><span class="tag">${'★'.repeat(s.lv || 1)}${'☆'.repeat(3 - (s.lv || 1))}</span>${s.custom ? '<span class="tag">自訂</span>' : ''}</div><span class="score-badge ${pctClass(b)}">${b == null ? '未練' : b}</span></button>`;
+}
+
+/* ---------- 快問快答 ---------- */
+let drill = null;
+function openDrill(id) {
+  const pool = OBJECTIONS;
+  const o = id ? pool.find(x => x.id === id) : shuffle(pool.filter(x => !drill || x.id !== drill.o.id))[0];
+  drill = { o, done: false };
+  renderDrill();
+  if (state.profile.autoSpeak) speak(o.c);
+}
+function renderDrill() {
+  const o = drill.o;
+  let res = '';
+  if (drill.done) {
+    const r = drill.r;
+    res = `<div class="msg k q${r.q}" style="margin-top:10px"><span class="who">🧑‍🏫 教練</span>${esc((r.q === 2 ? '✅ 很棒！' : r.q === 1 ? '🟡 還可以更好' : '🔴 要調整') + (r.good.length ? '\n👍 做得好：' + r.good.join('、') : '') + (r.weak.length ? '\n' + r.weak.map(d => '💡 ' + DIM[d].n + '：' + DIM[d].tip).join('\n') : '') + (r.notes.length ? '\n' + r.notes.join('\n') : ''))}</div>
+      <h3>教練示範</h3><div class="quote">${esc(o.model)}</div>
+      <button class="btn primary block" data-act="drill-next" style="margin-top:8px">下一題 ➡️</button>`;
+  }
+  openSheet('⚡ 快問快答', `
+    <p class="small muted">顧客丟出一句話，你會怎麼接？試著在 30 秒內回答。</p>
+    <div class="msg c" style="max-width:100%"><span class="who">🧑 顧客｜${esc(o.type)}${canSpeak ? `<button class="say" data-act="say" data-t="${esc(o.c)}" aria-label="朗讀">🔊</button>` : ''}</span><b style="font-size:1.1rem">${esc(o.c)}</b></div>
+    <details class="acc"><summary>💡 解題思路</summary><div class="body small">${esc(o.tip)}</div></details>
+    <textarea id="drillAns" rows="4" placeholder="把你會說的話打出來…" ${drill.done ? 'disabled' : ''}>${esc(drill.text || '')}</textarea>
+    ${drill.done ? '' : `<div class="row" style="margin-top:8px">${SR ? `<button class="btn sm" data-act="mic-drill" aria-label="用說的">🎤</button>` : ''}<span class="grow"></span><button class="btn sm" data-act="drill-next">換一題</button><button class="btn sm primary" data-act="drill-send">送出</button></div>`}
+    ${res}`);
+}
+function submitDrill() {
+  const t = $('#drillAns').value.trim(); if (!t) return toast('先寫下你的回答');
+  const focus = Object.keys(drill.o.k).join('');
+  const r = scoreText(t, { focus, k: drill.o.k }, { products: ['serum'] });
+  drill.done = true; drill.r = r; drill.text = t;
+  state.drills.push({ at: new Date().toISOString(), id: drill.o.id, q: r.q, x: r.x }); save();
+  renderDrill();
+}
+
+/* ---------- AI 自由對練提示詞 ---------- */
+function aiPrompt(id) {
+  const sc = id ? scen(id) : recommend().s;
+  const ps = (sc.products || []).map(prod).filter(Boolean);
+  const pText = ps.map(p => `- ${p.name}（${p.price ? '$' + p.price + '，' : ''}${p.size || ''}）\n  ${(p.fab || []).map(f => `特色：${f.f}；好處：${f.b}`).join('\n  ')}\n  適合：${p.who || ''}`).join('\n');
+  return `你是一位資深的顧客服務與銷售教練。請和我進行一場角色扮演練習，幫助我練習個人化服務。
+
+【你扮演的顧客】
+- ${sc.p.n}，${sc.p.age ? sc.p.age + ' 歲，' : ''}${sc.p.bg}
+- 內心真正的需求（不要直接說出來，等我問對問題才逐步透露）：${sc.p.need}
+- 一開始的心情：${sc.p.mood >= 55 ? '友善' : sc.p.mood >= 35 ? '有點防備' : '不耐煩或生氣'}
+
+【通路／練習重點】${sc.ch}｜${sc.skill}
+【我的練習目標】${sc.goal}
+
+【可參考的產品資訊】
+${pText || '（依一般美妝保養與保健食品常識即可）'}
+
+【規則】
+1. 你只用顧客身分說話，每次 1–3 句，像真人一樣，會猶豫、反問或提出異議；我做得好，你的態度就變軟，做不好就變冷淡。
+2. 每次我回答後，另起一段【教練】：用「同理傾聽、需求探詢、產品專業、價值說明、推進成交」五個面向各給 0–3 分，並給一句具體建議。
+3. 如果我說了誇大或違規用語（例如保證有效、治療、不會過敏、取代藥品），請立刻提醒並示範合規說法。
+4. 進行 5–6 回合，或我說「結束」時，給我總評：總分（100 分）、做得好的 2 點、要改善的 2 點，以及一段示範對話。
+5. 全程使用繁體中文（台灣用語）。
+
+請以顧客身分說出第一句話：「${sc.turns[0].c}」`;
+}
+function openAI(id) {
+  const t = aiPrompt(id);
+  openSheet('🤖 找 AI 自由對練', `
+    <p class="small">複製下面的提示詞，貼到 ChatGPT、Gemini 或 Claude，AI 就會扮演顧客、同時當你的教練，可以無限回合自由練習。</p>
+    <p class="small muted">提示詞只包含虛構的顧客情境與產品資訊，不含任何真實顧客資料。</p>
+    <textarea id="aiText" rows="12" readonly>${esc(t)}</textarea>
+    <button class="btn primary block" data-act="copy-ai" style="margin-top:8px">📋 複製提示詞</button>
+    <div class="row wrap" style="margin-top:8px">
+      <a class="btn sm grow" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+      <a class="btn sm grow" href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a>
+      <a class="btn sm grow" href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>
+    </div>`);
+}
+
+/* ---------- 自訂情境 ---------- */
+function openScenForm(id) {
+  const s = id ? state.customScen.find(x => x.id === id) : null;
+  openSheet(s ? '編輯自訂情境' : '＋ 建立自訂情境', `
+    <p class="small muted">寫下顧客會說的話（每行一句），練習時以「自己說說看」作答，由教練依五力評分。</p>
+    <label class="f" for="cTitle">情境標題</label><input type="text" id="cTitle" value="${esc(s?.title || '')}" placeholder="例：老顧客抱怨贈品太少">
+    <div class="row"><div class="grow"><label class="f" for="cCh">通路</label><select id="cCh">${CHANNELS.map(c => `<option ${s?.ch === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+    <div class="grow"><label class="f" for="cSkill">技巧</label><select id="cSkill">${SKILLS.map(c => `<option ${s?.skill === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div></div>
+    <div class="row"><div class="grow"><label class="f" for="cName">顧客稱呼</label><input type="text" id="cName" value="${esc(s?.p.n || '')}" placeholder="例：張姐"></div>
+    <div style="width:90px"><label class="f" for="cAge">年齡</label><input type="number" id="cAge" value="${esc(s?.p.age || '')}" inputmode="numeric"></div></div>
+    <label class="f" for="cBg">顧客背景</label><input type="text" id="cBg" value="${esc(s?.p.bg || '')}" placeholder="例：買了三年的老顧客，這次活動贈品變少">
+    <label class="f" for="cNeed">顧客內心真正的需求</label><input type="text" id="cNeed" value="${esc(s?.p.need || '')}" placeholder="例：其實是想被重視，覺得老顧客沒有被照顧">
+    <label class="f" for="cGoal">練習目標</label><input type="text" id="cGoal" value="${esc(s?.goal || '')}" placeholder="例：安撫情緒並提出老顧客專屬的關懷">
+    <label class="f">相關商品</label><div class="chips wrap" style="flex-wrap:wrap">${allProducts().map(p => `<label class="chip"><input type="checkbox" class="cProd" value="${p.id}" ${s?.products?.includes(p.id) ? 'checked' : ''}> ${esc(p.name)}</label>`).join('')}</div>
+    <label class="f" for="cLines">顧客台詞（每行一句，3–6 句）</label><textarea id="cLines" rows="5" placeholder="這次贈品怎麼變這麼少？&#10;我買了三年耶，都沒有比較好的優惠嗎？&#10;那你能幫我做什麼？">${esc(s ? s.turns.map(t => t.c).join('\n') : '')}</textarea>
+    <div class="row" style="margin-top:12px">${s ? `<button class="btn" data-act="del-scen" data-id="${s.id}">刪除</button>` : ''}<button class="btn primary grow" data-act="save-scen" data-id="${s?.id || ''}">儲存</button></div>`);
+}
+function saveScen(id) {
+  const lines = $('#cLines').value.split('\n').map(x => x.trim()).filter(Boolean).slice(0, 8);
+  const title = $('#cTitle').value.trim();
+  if (!title || lines.length < 2) return toast('請填標題，並至少寫兩句顧客台詞');
+  const n = lines.length;
+  const focusAt = i => i === 0 ? 'EA' : i === n - 1 ? 'C' : i === 1 ? 'AK' : 'KV';
+  const sc = { id: id || 'c-' + uid(), custom: true, title, ch: $('#cCh').value, skill: $('#cSkill').value, lv: 2,
+    products: $$('.cProd').filter(x => x.checked).map(x => x.value),
+    p: { n: $('#cName').value.trim() || '顧客', age: Number($('#cAge').value) || '', av: '🧑', bg: $('#cBg').value.trim(), need: $('#cNeed').value.trim() || '（未填寫）', mood: 45 },
+    goal: $('#cGoal').value.trim() || '用五力回應顧客，留下下一步。',
+    turns: lines.map((c, i) => ({ c, focus: focusAt(i) })),
+    end: { good: '顧客感受到你的用心，願意繼續往來。', mid: '顧客態度普通，記得後續追蹤。', bad: '顧客不太滿意，再練一次吧。' } };
+  const i = state.customScen.findIndex(x => x.id === sc.id);
+  if (i >= 0) state.customScen[i] = sc; else state.customScen.push(sc);
+  save(); closeSheet(); render(); toast('已儲存自訂情境');
+}
+
+/* =====================================================================
+   畫面：知識
+   ===================================================================== */
+let kq = '', kcat = '全部';
+function renderKnowledge() {
+  const cats = ['全部', ...new Set(allProducts().map(p => p.cat))];
+  const list = filterProds();
+  $('#view').innerHTML = `
+    <div class="card"><div class="row"><span style="font-size:1.6rem">📝</span><div class="grow"><b>產品知識小測驗</b><br><span class="small muted">5 題：FAB 好處說法、適合對象、合規用語</span></div><button class="btn sm primary" data-act="quiz">開始</button></div></div>
+    <input type="text" id="kq" placeholder="🔍 搜尋商品、膚況、關鍵字" value="${esc(kq)}" aria-label="搜尋商品">
+    <div class="chips" style="margin-top:8px">${cats.map(c => `<button class="chip" data-act="kcat" data-v="${esc(c)}" aria-pressed="${kcat === c}">${esc(c)}</button>`).join('')}</div>
+    <div id="plist">${prodList(list)}</div>
+    <button class="btn block" data-act="new-prod" style="margin-top:6px">＋ 新增我的商品</button>
+    <p class="small muted">內建商品為虛構範例，可新增你們公司的實際商品，所有練習與測驗都會一起使用。</p>`;
+  const inp = $('#kq');
+  const refresh = () => { kq = inp.value.trim(); $('#plist').innerHTML = prodList(filterProds()); };
+  inp.addEventListener('input', e => { if (!e.isComposing) refresh(); });
+  inp.addEventListener('compositionend', refresh);
+}
+const filterProds = () => allProducts().filter(p => (kcat === '全部' || p.cat === kcat) && (!kq || (p.name + p.who + (p.keys || []).join('')).includes(kq)));
+function prodList(list) {
+  return list.map(p => `<button class="prod" data-act="prod" data-id="${p.id}"><span class="pi">${esc(p.icon || '🛍️')}</span><span class="grow"><b>${esc(p.name)}</b>${p.custom ? ' <span class="tag">自訂</span>' : ''}<br><span class="small muted">${esc(p.who || '')}</span></span><span class="small muted">${p.price ? '$' + Number(p.price).toLocaleString() : ''}</span></button>`).join('') || '<p class="muted">找不到符合的商品。</p>';
+}
+function openProd(id) {
+  const p = prod(id); if (!p) return;
+  const related = SCENARIOS.filter(s => s.products.includes(id));
+  openSheet(`${esc(p.icon || '🛍️')} ${esc(p.name)}`, `
+    <p><span class="tag b">${esc(p.cat)}</span>${p.price ? `<b>$${Number(p.price).toLocaleString()}</b>　` : ''}<span class="small muted">${esc(p.size || '')}</span></p>
+    <p class="small"><b>適合誰：</b>${esc(p.who || '')}</p>
+    <h3>FAB 說法</h3>
+    <table class="t"><tr><th>特色 F</th><th>優點 A</th><th>對顧客的好處 B</th></tr>${(p.fab || []).map(f => `<tr><td>${esc(f.f)}</td><td>${esc(f.a)}</td><td><b>${esc(f.b)}</b></td></tr>`).join('')}</table>
+    ${(p.fab || []).length ? `<div class="quote small">💬 試著這樣說：「這款${esc(p.fab[0].f)}，${esc(p.fab[0].a)}，所以對您來說，${esc(p.fab[0].b)}。」</div>` : ''}
+    ${(p.faq || []).length ? `<h3>顧客常問</h3>${p.faq.map(([q, a]) => `<p class="small"><b>Q：${esc(q)}</b><br>A：${esc(a)}</p>`).join('')}` : ''}
+    ${(p.pair || []).length ? `<h3>搭配推薦</h3><p class="small">${p.pair.map(prod).filter(Boolean).map(x => esc(x.icon + ' ' + x.name)).join('、')}</p>` : ''}
+    ${p.avoid ? `<h3>⚠️ 不能說</h3><p class="small bad-t">${esc(p.avoid)}</p>` : ''}
+    ${related.length ? `<h3>相關練習</h3>${related.map(s => `<button class="btn sm" data-act="play" data-id="${s.id}" style="margin:3px">▶ ${esc(s.title)}</button>`).join('')}` : ''}
+    ${p.custom ? `<div class="row" style="margin-top:12px"><button class="btn grow" data-act="edit-prod" data-id="${p.id}">✏️ 編輯</button><button class="btn grow" data-act="del-prod" data-id="${p.id}">刪除</button></div>` : ''}`);
+}
+function openProdForm(id) {
+  const p = id ? state.customProd.find(x => x.id === id) : null;
+  openSheet(p ? '編輯商品' : '＋ 新增我的商品', `
+    <label class="f" for="pName">商品名稱</label><input type="text" id="pName" value="${esc(p?.name || '')}">
+    <div class="row"><div class="grow"><label class="f" for="pCat">類別</label><input type="text" id="pCat" value="${esc(p?.cat || '')}" placeholder="保養／保健／彩妝…"></div>
+    <div style="width:110px"><label class="f" for="pPrice">售價</label><input type="number" id="pPrice" value="${esc(p?.price || '')}" inputmode="numeric"></div>
+    <div style="width:70px"><label class="f" for="pIcon">圖示</label><input type="text" id="pIcon" value="${esc(p?.icon || '🛍️')}"></div></div>
+    <label class="f" for="pSize">容量與使用量</label><input type="text" id="pSize" value="${esc(p?.size || '')}" placeholder="例：30ml，每天 2 滴約 2 個月">
+    <label class="f" for="pWho">適合誰</label><input type="text" id="pWho" value="${esc(p?.who || '')}">
+    <label class="f" for="pFab">FAB（每行一組：特色｜優點｜好處）</label><textarea id="pFab" rows="4" placeholder="含玻尿酸｜吸收快｜上妝更服貼">${esc((p?.fab || []).map(f => [f.f, f.a, f.b].join('｜')).join('\n'))}</textarea>
+    <label class="f" for="pFaq">常見問題（每行一題：問題｜回答）</label><textarea id="pFaq" rows="3">${esc((p?.faq || []).map(x => x.join('｜')).join('\n'))}</textarea>
+    <label class="f" for="pKeys">專業關鍵字（用頓號或逗號分隔，教練評分會用到）</label><input type="text" id="pKeys" value="${esc((p?.keys || []).join('、'))}">
+    <label class="f" for="pAvoid">不能說的話</label><input type="text" id="pAvoid" value="${esc(p?.avoid || '')}">
+    <button class="btn primary block" data-act="save-prod" data-id="${p?.id || ''}" style="margin-top:12px">儲存</button>`);
+}
+function saveProd(id) {
+  const name = $('#pName').value.trim(); if (!name) return toast('請填商品名稱');
+  const split3 = l => { const [f, a, b] = l.split(/[｜|]/).map(x => x.trim()); return { f: f || '', a: a || '', b: b || a || '' }; };
+  const p = { id: id || 'p-' + uid(), custom: true, name, cat: $('#pCat').value.trim() || '其他', price: Number($('#pPrice').value) || '', icon: $('#pIcon').value.trim() || '🛍️',
+    size: $('#pSize').value.trim(), who: $('#pWho').value.trim(),
+    fab: $('#pFab').value.split('\n').map(x => x.trim()).filter(Boolean).map(split3),
+    faq: $('#pFaq').value.split('\n').map(x => x.trim()).filter(Boolean).map(l => l.split(/[｜|]/).map(x => x.trim())).filter(x => x[0]).map(([q, a]) => [q, a || '']),
+    keys: $('#pKeys').value.split(/[、,，\s]+/).map(x => x.trim()).filter(Boolean), avoid: $('#pAvoid').value.trim(), pair: [] };
+  const i = state.customProd.findIndex(x => x.id === p.id);
+  if (i >= 0) state.customProd[i] = p; else state.customProd.push(p);
+  save(); closeSheet(); render(); toast('已儲存商品');
+}
+
+/* ---------- 小測驗 ---------- */
+let quiz = null;
+function makeQuiz() {
+  const ps = allProducts().filter(p => (p.fab || []).length);
+  const qs = [];
+  for (const p of shuffle(ps).slice(0, 2)) {
+    const f = shuffle(p.fab);
+    const others = shuffle(ps.flatMap(x => x.fab.map(y => y.f))).filter(t => t !== f[0].f).slice(0, 2);
+    qs.push({ q: `介紹「${p.name}」時，下列哪一句是對顧客的「好處（Benefit）」，而不只是特色？`, right: f[0].b, opts: shuffle([f[0].b, f[0].f, ...others.slice(0, 1)]), why: `「${f[0].b}」說出了顧客能得到什麼；「${f[0].f}」只是產品特色。` });
+  }
+  for (const p of shuffle(ps.filter(p => p.who)).slice(0, 2)) {
+    const wrong = shuffle(ps.filter(x => x.id !== p.id && x.who)).slice(0, 2).map(x => x.name);
+    qs.push({ q: `顧客的狀況是：「${p.who}」，最適合先推薦哪一個？`, right: p.name, opts: shuffle([p.name, ...wrong]), why: `${p.name} 的適用對象就是這類顧客。` });
+  }
+  const bad = shuffle(COMPLIANCE)[0];
+  const okOpts = shuffle(COMPLIANCE.filter(c => c !== bad)).slice(0, 2).map(c => c[1]);
+  const badPhrase = bad[0].split('、')[0];
+  qs.push({ q: '下列哪一句話「不能」對顧客說？', right: badPhrase, opts: shuffle([badPhrase, ...okOpts]), why: `「${badPhrase}」屬於誇大或療效用語，可改說：「${bad[1]}」。` });
+  return shuffle(qs).slice(0, 5);
+}
+function openQuiz() { quiz = { qs: makeQuiz(), i: 0, right: 0, ans: null }; renderQuiz(); }
+function renderQuiz() {
+  if (quiz.i >= quiz.qs.length) {
+    state.quizzes.push({ at: new Date().toISOString(), right: quiz.right, total: quiz.qs.length }); save();
+    return openSheet('📝 測驗結果', `<div class="center">${ring(Math.round(quiz.right / quiz.qs.length * 100))}<h2>答對 ${quiz.right}／${quiz.qs.length} 題</h2><p class="muted">${quiz.right === quiz.qs.length ? '全對！產品知識很紮實 🎉' : '把答錯的商品卡再看一次，下次會更好。'}</p></div><button class="btn primary block" data-act="quiz">再測一次</button>`);
+  }
+  const q = quiz.qs[quiz.i];
+  openSheet(`📝 第 ${quiz.i + 1}／${quiz.qs.length} 題`, `<p><b>${esc(q.q)}</b></p>
+    ${q.opts.map((o, i) => `<button class="qopt ${quiz.ans != null ? (o === q.right ? 'right' : i === quiz.ans ? 'wrong' : '') : ''}" data-act="qans" data-i="${i}" ${quiz.ans != null ? 'disabled' : ''}>${esc(o)}</button>`).join('')}
+    ${quiz.ans != null ? `<p class="small">${q.opts[quiz.ans] === q.right ? '✅ 答對了！' : '❌ 再想想。'}${esc(q.why)}</p><button class="btn primary block" data-act="qnext">下一題</button>` : ''}`);
+}
+
+/* =====================================================================
+   畫面：流程
+   ===================================================================== */
+function renderFlow() {
+  $('#view').innerHTML = `
+    <h2>服務六步驟：迎・探・薦・解・成・續</h2>
+    <p class="small muted">每一個情境練習都依這六步驟設計。先熟悉流程，再到「練習」實戰。</p>
+    ${FLOW.map((f, i) => `<details class="acc" ${i === 0 ? 'open' : ''}><summary><span class="step-ic">${f.s}</span><span class="grow">${i + 1}. ${f.n}<br><span class="small muted" style="font-weight:400">${f.goal}</span></span></summary><div class="body">
+      <p class="small ok-t"><b>✅ 這樣做</b></p><ul class="tight small">${f.do.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      <p class="small bad-t"><b>⛔ 避免</b></p><ul class="tight small">${f.dont.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      <p class="small"><b>💬 參考說法</b></p>${f.say.map(x => `<div class="quote">${esc(x)}</div>`).join('')}
+    </div></details>`).join('')}
+    <h2>常見異議 12 招</h2>
+    <p class="small muted">點「練這題」直接進入快問快答。</p>
+    ${OBJECTIONS.map(o => `<details class="acc"><summary><span class="tag a">${esc(o.type)}</span><span class="grow">「${esc(o.c)}」</span></summary><div class="body"><p class="small"><b>思路：</b>${esc(o.tip)}</p><div class="quote">${esc(o.model)}</div><button class="btn sm primary" data-act="drill-id" data-id="${o.id}">⚡ 練這題</button></div></details>`).join('')}
+    <h2>各通路小提醒</h2>
+    ${CHANNEL_TIPS.map(c => `<details class="acc"><summary><span style="font-size:1.3rem">${c.i}</span><span class="grow">${c.ch}</span></summary><div class="body"><ul class="tight small">${c.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div></details>`).join('')}
+    <h2>⚖️ 合規用語對照</h2>
+    <div class="card"><table class="t"><tr><th>⛔ 不能說</th><th>✅ 可以這樣說</th></tr>${COMPLIANCE.map(([a, b]) => `<tr><td class="bad-t">${esc(a)}</td><td class="ok-t">${esc(b)}</td></tr>`).join('')}</table>
+    <p class="small muted" style="margin-bottom:0">以上為一般原則，實際用語請以公司法務與相關法規（如化粧品、食品廣告規範）為準。</p></div>`;
+}
+
+/* =====================================================================
+   畫面：成長
+   ===================================================================== */
+function radar(vals) {
+  const cx = 130, cy = 120, R = 86, n = DIMS.length;
+  const pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const rings = [0.25, 0.5, 0.75, 1].map(f => `<polygon points="${DIMS.map((_, i) => pt(i, R * f).join(',')).join(' ')}" fill="none" stroke="var(--line)"/>`).join('');
+  const axes = DIMS.map((d, i) => { const [x, y] = pt(i, R); const [lx, ly] = pt(i, R + 22); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)"/><text x="${lx}" y="${ly + 4}" text-anchor="middle" font-size="12" fill="var(--muted)">${d.n}</text>`; }).join('');
+  const shape = DIMS.map((d, i) => pt(i, R * (vals[d.k] ?? 0)).join(',')).join(' ');
+  return `<svg viewBox="0 0 260 245" style="width:100%;max-width:340px;display:block;margin:0 auto" role="img" aria-label="五力雷達圖">${rings}${axes}<polygon points="${shape}" fill="var(--brand)" fill-opacity=".25" stroke="var(--brand)" stroke-width="2"/>${DIMS.map((d, i) => { const [x, y] = pt(i, R * (vals[d.k] ?? 0)); return `<circle cx="${x}" cy="${y}" r="3.5" fill="var(--brand)"/>`; }).join('')}</svg>`;
+}
+function trend(xs) {
+  if (xs.length < 2) return '<p class="small muted">練習兩次以上就會出現分數趨勢。</p>';
+  const W = 300, H = 80, n = xs.length;
+  const p = xs.map((v, i) => [10 + i * (W - 20) / (n - 1), H - 10 - (v / 100) * (H - 20)]);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px" role="img" aria-label="最近分數趨勢"><line x1="10" x2="${W - 10}" y1="${H - 10 - .8 * (H - 20)}" y2="${H - 10 - .8 * (H - 20)}" stroke="var(--line)" stroke-dasharray="4 4"/><polyline points="${p.map(q => q.join(',')).join(' ')}" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linejoin="round"/>${p.map((q, i) => `<circle cx="${q[0]}" cy="${q[1]}" r="3.5" fill="var(--brand)"><title>${xs[i]} 分</title></circle>`).join('')}</svg>`;
+}
+function renderProgress() {
+  const S = state.sessions;
+  const av = dimAverages();
+  const avg = S.length ? Math.round(S.reduce((n, s) => n + s.score, 0) / S.length) : 0;
+  const top = S.length ? Math.max(...S.map(s => s.score)) : 0;
+  const weekAgo = Date.now() - 7 * 864e5;
+  const week = S.filter(s => new Date(s.at) >= weekAgo).length + state.drills.filter(d => new Date(d.at) >= weekAgo).length;
+  const { s: rec, weak } = recommend();
+  $('#view').innerHTML = `
+    <div class="grid2">
+      <div class="kpi"><b>${S.length}</b><span>情境練習次數</span></div>
+      <div class="kpi"><b>${avg || '—'}</b><span>平均分數</span></div>
+      <div class="kpi"><b>${top || '—'}</b><span>最高分</span></div>
+      <div class="kpi"><b>${streak()} 天</b><span>連續練習</span></div>
+    </div>
+    <div class="card"><h3 style="margin-top:0">五力雷達（最近 20 次）</h3>${S.length ? radar(av) + DIMS.map(d => av[d.k] != null ? dimRow(d, av[d.k]) : '').join('') : '<p class="muted">完成第一個情境練習後，這裡會出現你的五力分析。</p>'}</div>
+    <div class="card"><h3 style="margin-top:0">分數趨勢</h3>${trend(S.slice(-12).map(s => s.score))}<p class="small muted" style="margin:0">本週練習 ${week} 次（含快問快答）｜虛線為 80 分</p></div>
+    <div class="card"><div class="row"><span style="font-size:1.6rem">🎯</span><div class="grow"><b>教練建議下一步</b><br><span class="small">${weak ? `你的「${DIM[weak].n}」相對較弱。${DIM[weak].tip}` : '先完成一個情境練習，教練會分析你的強項與弱項。'}</span></div></div><button class="btn primary block" style="margin-top:10px" data-act="play" data-id="${rec.id}">▶ 練「${esc(rec.title)}」</button></div>
+    <h2>徽章</h2><div class="card" style="display:flex;flex-wrap:wrap;justify-content:center">${badges().map(b => `<span class="badge ${b.on ? 'on' : ''}"><b>${b.i}</b>${b.n}</span>`).join('')}</div>
+    <h2>各情境最佳成績</h2>
+    <div class="card">${SCENARIOS.map(s => { const b = best(s.id); return `<button class="list-btn" data-act="play" data-id="${s.id}"><span class="ic">${s.p.av}</span><span class="grow">${esc(s.title)}<br><span class="small muted">${s.ch}｜${s.skill}</span></span><span class="score-badge ${pctClass(b)}">${b == null ? '未練' : b}</span></button>`; }).join('')}</div>
+    <div class="row wrap"><button class="btn grow" data-act="share-progress">📤 分享成長報告給主管</button><button class="btn grow" data-act="csv">⬇️ 匯出練習紀錄 CSV</button></div>`;
+}
+function progressText() {
+  const S = state.sessions; const av = dimAverages();
+  const avg = S.length ? Math.round(S.reduce((n, s) => n + s.score, 0) / S.length) : 0;
+  const lines = [`📈【銷售教練｜成長報告】${state.profile.name || ''}${state.profile.role ? '（' + state.profile.role + '）' : ''}`, `日期：${today()}`,
+    `情境練習 ${S.length} 次，平均 ${avg} 分，最高 ${S.length ? Math.max(...S.map(s => s.score)) : 0} 分`, `快問快答 ${state.drills.length} 題｜連續練習 ${streak()} 天`, '五力：' + DIMS.map(d => `${d.n} ${av[d.k] == null ? '—' : Math.round(av[d.k] * 100)}`).join('、')];
+  const rec = recommend(); if (rec.weak) lines.push(`下一步：加強「${DIM[rec.weak].n}」`);
+  return lines.join('\n');
+}
+
+/* =====================================================================
+   畫面：更多
+   ===================================================================== */
+let deferredPrompt = null;
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function installBanner() {
+  if (standalone() || demo) return '';
+  let hide = false; try { hide = localStorage.getItem('ssc-hide-install') === today(); } catch (e) { /* 無法讀取 */ }
+  if (hide || !(deferredPrompt || isIOS)) return '';
+  return `<div class="banner"><span style="font-size:1.5rem">📲</span><span class="grow"><b>把銷售教練放到手機桌面</b><br><span class="small muted">像 APP 一樣一按就開，沒網路也能練</span></span>
+    <button class="btn sm primary" data-act="install">安裝</button><button class="icon-btn" data-act="hide-install" aria-label="今天不再提示" style="width:36px;height:36px">✕</button></div>`;
+}
+async function install() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null; render();
+    if (outcome === 'accepted') toast('安裝好了！之後從桌面圖示打開就可以');
+    return;
+  }
+  openSheet('📲 安裝到手機桌面', isIOS
+    ? `<ol><li>用 <b>Safari</b> 打開這個網頁</li><li>點下方的 <b>分享</b> 按鈕（方框加向上箭頭）</li><li>選 <b>加入主畫面</b>，再按 <b>新增</b></li></ol>`
+    : `<ol><li>用 <b>Chrome</b> 或 <b>Edge</b> 打開這個網頁</li><li>點右上角 <b>⋮</b> 選單</li><li>選 <b>安裝應用程式</b> 或 <b>加到主畫面</b></li></ol><p class="small muted">電腦版：網址列右側會出現安裝圖示 ⊕。</p>`);
+}
+function renderMore() {
+  const p = state.profile;
+  $('#view').innerHTML = `
+    <div class="card">
+      <label class="f" for="mName" style="margin-top:0">我的名字</label><input type="text" id="mName" value="${esc(p.name)}" placeholder="例：小美">
+      <label class="f" for="mRole">我的角色</label><select id="mRole"><option value="">請選擇</option>${ROLES.map(r => `<option ${p.role === r ? 'selected' : ''}>${r}</option>`).join('')}</select>
+      <p class="small muted" style="margin-bottom:0">角色會影響推薦的練習情境。</p>
+    </div>
+    <div class="card">
+      ${canSpeak ? `<label class="row list-btn" style="cursor:pointer"><span class="ic">🔊</span><span class="grow">自動朗讀顧客台詞<br><span class="small muted">練 TM 電話時特別好用</span></span><input type="checkbox" id="mSpeak" ${p.autoSpeak ? 'checked' : ''}></label>` : ''}
+      <label class="row list-btn" style="cursor:pointer"><span class="ic">🔠</span><span class="grow">大字模式</span><input type="checkbox" id="mBig" ${p.big ? 'checked' : ''}></label>
+      <div class="row list-btn"><span class="ic">🌓</span><span class="grow">外觀</span><select id="mTheme" style="width:auto"><option value="auto" ${p.theme === 'auto' ? 'selected' : ''}>跟隨系統</option><option value="light" ${p.theme === 'light' ? 'selected' : ''}>淺色</option><option value="dark" ${p.theme === 'dark' ? 'selected' : ''}>深色</option></select></div>
+    </div>
+    <div class="card">
+      ${standalone() ? `<div class="list-btn"><span class="ic">✅</span><span class="grow">已安裝成 APP</span></div>` : `<button class="list-btn" data-act="install"><span class="ic">📲</span><span class="grow">安裝到手機桌面</span>›</button>`}
+      <button class="list-btn" data-act="guide"><span class="ic">📖</span><span class="grow">使用說明</span>›</button>
+      <button class="list-btn" data-act="trainer"><span class="ic">🧑‍🏫</span><span class="grow">講師／主管帶領指南<br><span class="small muted">晨會、新人 7 天、三人角色扮演</span></span>›</button>
+      <button class="list-btn" data-act="backup"><span class="ic">💾</span><span class="grow">備份資料（下載 JSON）</span>›</button>
+      <label class="list-btn" style="cursor:pointer"><span class="ic">📂</span><span class="grow">還原備份</span><input type="file" id="mRestore" accept="application/json,.json" hidden>›</label>
+      <button class="list-btn" data-act="reset"><span class="ic">🗑️</span><span class="grow bad-t">清除所有資料</span>›</button>
+    </div>
+    <p class="small muted center">🔒 所有練習紀錄只存在這台裝置的瀏覽器，不會上傳到任何伺服器。<br>AI 自由對練時，只會複製虛構的情境提示詞，不含顧客資料。</p>`;
+  $('#mName').addEventListener('change', e => { state.profile.name = e.target.value.trim(); save(); });
+  $('#mRole').addEventListener('change', e => { state.profile.role = e.target.value; save(); toast('已更新角色，推薦練習會跟著調整'); });
+  $('#mSpeak') && $('#mSpeak').addEventListener('change', e => { state.profile.autoSpeak = e.target.checked; save(); if (e.target.checked) speak('您好，我是您的練習顧客。'); });
+  $('#mBig').addEventListener('change', e => { state.profile.big = e.target.checked; save(); applyPrefs(); });
+  $('#mTheme').addEventListener('change', e => { state.profile.theme = e.target.value; save(); applyPrefs(); });
+  $('#mRestore').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(t => { const s = JSON.parse(t); if (!s.profile || !Array.isArray(s.sessions)) throw new Error(); state = { ...blank(), ...s }; save(); applyPrefs(); render(); toast('已還原備份'); }).catch(() => toast('這不是銷售教練的備份檔'));
+  });
+}
+function openGuide() {
+  openSheet('📖 使用說明', `
+    <p><b>銷售教練</b>把產品知識、顧客情境、服務流程與銷售技巧變成互動練習，每一句回答都有教練即時點評。</p>
+    <h3>🎯 練習</h3><ul class="tight small"><li>每個情境有一位虛構顧客，4 個回合。</li><li>可以選 A／B／C，也可以按「✍️ 自己說說看」打字或用 🎤 說話。</li><li>教練會依 <b>五力</b> 評分：💗同理傾聽、🔍需求探詢、📘產品專業、💎價值說明、🤝推進成交。</li><li>說了誇大或療效用語，會被標記 ⚠️ 合規風險並扣分。</li><li>顧客心情會隨你的回答變化，太差顧客會提早離開。</li></ul>
+    <h3>⚡ 快問快答</h3><p class="small">12 種常見異議隨機出題，練習 30 秒內接住顧客。</p>
+    <h3>🤖 AI 自由對練</h3><p class="small">複製提示詞到 ChatGPT／Gemini／Claude，AI 會扮演顧客並當你的教練，無限回合練習。</p>
+    <h3>📚 知識 & 🧭 流程</h3><p class="small">商品 FAB 卡、小測驗、服務六步驟、12 招異議處理、合規用語對照。可以新增自己公司的商品與情境。</p>
+    <h3>📈 成長</h3><p class="small">五力雷達、分數趨勢、徽章，一鍵分享成長報告給主管。</p>`);
+}
+function openTrainer() {
+  openSheet('🧑‍🏫 講師／主管帶領指南', `
+    <details class="acc" open><summary>☀️ 15 分鐘晨會：快問快答接力</summary><div class="body small"><ol class="tight"><li>主管用投影或手機開「⚡ 快問快答」，唸出顧客的話。</li><li>每人 30 秒說出自己的回答。</li><li>全組投票最佳說法，再對照教練示範。</li><li>每週聚焦一種異議（例如價格週、敏感肌週）。</li></ol></div></details>
+    <details class="acc"><summary>👥 三人角色扮演（顧客／銷售／觀察員）</summary><div class="body small"><ol class="tight"><li>觀察員打開一個情境，扮演顧客念台詞，並保密「顧客內心話」。</li><li>銷售者用自己的話回答，觀察員依五力各給 0–3 分。</li><li>結束後由觀察員揭曉內心話，三人輪流換角色。</li><li>最後每人用 App 再練一次同一情境，比較分數。</li></ol></div></details>
+    <details class="acc"><summary>🌱 新人 7 天上手計畫</summary><div class="body small"><table class="t"><tr><td>Day 1</td><td>讀「🧭 流程」六步驟＋合規用語，完成 1 個 ★ 情境</td></tr><tr><td>Day 2</td><td>讀商品卡，知識小測驗拿到 4 題以上</td></tr><tr><td>Day 3–5</td><td>每天 2 個情境＋5 題快問快答，至少一次用「自己說」</td></tr><tr><td>Day 6</td><td>和主管做三人角色扮演，建立一個自訂情境</td></tr><tr><td>Day 7</td><td>分享成長報告給主管，討論最弱的一個面向</td></tr></table></div></details>
+    <details class="acc"><summary>📞 TM 團隊：每週一主題</summary><div class="body small"><ul class="tight"><li>開啟「自動朗讀顧客台詞」，模擬電話情境。</li><li>第 1 週開場許可、第 2 週忙碌異議、第 3 週回購提醒、第 4 週沉睡喚回（用自訂情境）。</li><li>每週五各自分享成長報告，主管看五力趨勢給回饋。</li></ul></div></details>
+    <details class="acc"><summary>🏬 把真實案例變成教材</summary><div class="body small"><p>把門市或客服遇過的真實狀況（去除姓名、電話等個資）寫成「自訂情境」，再用「💾 備份」把檔案傳給同仁「還原」，全團隊就能練同一題。</p></div></details>`);
+}
+
+/* =====================================================================
+   路由與事件
+   ===================================================================== */
+let tab = 'practice';
+function applyPrefs() {
+  const p = state.profile;
+  document.documentElement.classList.toggle('big', !!p.big);
+  if (p.theme === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', p.theme);
+}
+function go(t) { location.hash = t; }
+function route() {
+  const h = location.hash.slice(1) || 'practice';
+  if (h.startsWith('play/')) {
+    const id = h.slice(5);
+    if (!play || play.sc.id !== id) { const sc = scen(id); if (!sc) return go('practice'); startPlay(id); return; }
+    return renderPlay();
+  }
+  if (h === 'drill') { tab = 'practice'; history.replaceState(null, '', '#practice'); render(); openDrill(); return; }
+  if (play && !play.done) play = null;
+  document.body.classList.remove('playing');
+  tab = ['practice', 'knowledge', 'flow', 'progress', 'more'].includes(h) ? h : 'practice';
+  render();
+}
+function render() {
+  if (location.hash.startsWith('#play/') && play) return renderPlay();
+  document.body.classList.remove('playing');
+  $('#title').textContent = { practice: '銷售教練', knowledge: '產品知識', flow: '服務流程', progress: '我的成長', more: '更多' }[tab];
+  $$('#tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
+  ({ practice: renderPractice, knowledge: renderKnowledge, flow: renderFlow, progress: renderProgress, more: renderMore })[tab]();
+  scrollTo(0, 0);
+}
+function openWelcome() {
+  openSheet('👋 歡迎使用銷售教練', `
+    <p>這是你的口袋教練：用虛構的顧客情境練習服務與銷售，每句話都有即時點評。</p>
+    <label class="f" for="wName">怎麼稱呼你？</label><input type="text" id="wName" placeholder="例：小美">
+    <label class="f">你的角色</label><div class="chips" style="flex-wrap:wrap">${ROLES.map(r => `<button class="chip" data-act="w-role" data-v="${r}" aria-pressed="false">${r}</button>`).join('')}</div>
+    <button class="btn primary block" data-act="welcome-go" style="margin-top:14px">開始第一個練習 ▶</button>`);
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act],[data-tab]'); if (!el) return;
+  if (el.dataset.tab) { if (play) play = null; go(el.dataset.tab); return; }
+  const act = el.dataset.act, id = el.dataset.id;
+  switch (act) {
+    case 'close-sheet': closeSheet(); break;
+    case 'play': closeSheet(); play = null; startPlay(id); break;
+    case 'pick': { const turn = play.sc.turns[play.ti]; answer(turn.o[Number(el.dataset.i)]); break; }
+    case 'send': { const t = $('#ans').value.trim(); if (!t) return toast('先寫下你想說的話'); answer(null, t); break; }
+    case 'text-mode': play.textMode = true; renderPlay(); $('#ans').focus(); break;
+    case 'choice-mode': play.textMode = false; renderPlay(); break;
+    case 'hint': { const t = play.sc.turns[play.ti]; $('#hintBox').innerHTML = `<div class="quote small">💡 ${esc(t.hint || t.focus.split('').map(d => DIM[d].tip).join(' '))}</div>`; break; }
+    case 'mic': listen($('#ans'), el); break;
+    case 'mic-drill': listen($('#drillAns'), el); break;
+    case 'say': e.stopPropagation(); speak(el.dataset.t); break;
+    case 'replay': { const sid = play.sc.id; play = null; startPlay(sid); renderPlay(); scrollTo(0, 0); break; }
+    case 'next-rec': { const r = recommend().s; play = null; startPlay(r.id); renderPlay(); scrollTo(0, 0); break; }
+    case 'share-result': shareText(`🎯【銷售教練】我完成了「${play.sc.title}」練習，拿到 ${play.result.score} 分！\n` + DIMS.filter(d => d.k in play.result.dims).map(d => `${d.i}${d.n} ${Math.round(play.result.dims[d.k] * 100)}`).join('　')); break;
+    case 'ai-prompt': openAI(id); break;
+    case 'copy-ai': copyText($('#aiText').value, '已複製，貼到 AI 就能開始練習'); break;
+    case 'drill': openDrill(); break;
+    case 'drill-id': openDrill(id); break;
+    case 'drill-next': openDrill(); break;
+    case 'drill-send': submitDrill(); break;
+    case 'f-ch': filt.ch = el.dataset.v; renderPractice(); break;
+    case 'f-skill': filt.skill = el.dataset.v; renderPractice(); break;
+    case 'new-scen': openScenForm(); break;
+    case 'save-scen': saveScen(id); break;
+    case 'del-scen': if (confirm('確定刪除這個自訂情境？')) { state.customScen = state.customScen.filter(s => s.id !== id); save(); closeSheet(); render(); } break;
+    case 'kcat': kcat = el.dataset.v; renderKnowledge(); break;
+    case 'prod': openProd(id); break;
+    case 'new-prod': openProdForm(); break;
+    case 'edit-prod': openProdForm(id); break;
+    case 'save-prod': saveProd(id); break;
+    case 'del-prod': if (confirm('確定刪除這個商品？')) { state.customProd = state.customProd.filter(p => p.id !== id); save(); closeSheet(); render(); } break;
+    case 'quiz': openQuiz(); break;
+    case 'qans': quiz.ans = Number(el.dataset.i); if (quiz.qs[quiz.i].opts[quiz.ans] === quiz.qs[quiz.i].right) quiz.right++; renderQuiz(); break;
+    case 'qnext': quiz.i++; quiz.ans = null; renderQuiz(); break;
+    case 'share-progress': shareText(progressText()); break;
+    case 'csv': {
+      const rows = [['日期', '情境', '通路', '分數', ...DIMS.map(d => d.n), '顧客心情', '合規風險次數']];
+      for (const s of state.sessions) rows.push([s.at.slice(0, 16).replace('T', ' '), s.title, s.ch, s.score, ...DIMS.map(d => s.dims[d.k] == null ? '' : Math.round(s.dims[d.k] * 100)), s.mood, s.x]);
+      download(`銷售教練練習紀錄_${today()}.csv`, '﻿' + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n'), 'text/csv'); break;
+    }
+    case 'install': install(); break;
+    case 'hide-install': try { localStorage.setItem('ssc-hide-install', today()); } catch (err) { /* 無法寫入 */ } render(); break;
+    case 'guide': openGuide(); break;
+    case 'trainer': openTrainer(); break;
+    case 'backup': download(`銷售教練備份_${today()}.json`, JSON.stringify(state, null, 1)); break;
+    case 'reset': if (confirm('確定清除所有練習紀錄、自訂情境與商品？這個動作無法復原。')) { state = blank(); state.profile.onboarded = true; save(); applyPrefs(); render(); toast('已清除'); } break;
+    case 'w-role': $$('[data-act="w-role"]').forEach(b => b.setAttribute('aria-pressed', b === el)); state.profile.role = el.dataset.v; break;
+    case 'welcome-go': state.profile.name = $('#wName').value.trim(); state.profile.onboarded = true; save(); closeSheet(); { const r = recommend().s; startPlay(r.id); } break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#sheet').classList.contains('open')) closeSheet();
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { if (e.target.id === 'ans') $('[data-act="send"]').click(); if (e.target.id === 'drillAns') submitDrill(); }
+});
+$('#helpBtn').addEventListener('click', openGuide);
+$('#backBtn').addEventListener('click', () => { speechSynthesis && speechSynthesis.cancel && speechSynthesis.cancel(); play = null; go('practice'); });
+window.addEventListener('hashchange', route);
+window.addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 4), { passive: true });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; if (tab === 'practice' && !play) renderPractice(); });
+window.addEventListener('appinstalled', () => { deferredPrompt = null; render(); });
+
+/* ---------- 示範資料（截圖用：?demo=home / play / result / progress） ---------- */
+function demoState() {
+  const s = blank(); s.profile = { ...s.profile, name: '小美', role: '門市人員', onboarded: true };
+  const base = Date.now() - 9 * 864e5; const scores = [58, 64, 61, 72, 70, 78, 75, 83, 86, 91];
+  scores.forEach((sc, i) => { const S = SCENARIOS[i % SCENARIOS.length]; s.sessions.push({ id: 'd' + i, sid: S.id, title: S.title, ch: S.ch, at: new Date(base + i * 864e5).toISOString(), score: sc, dims: { E: Math.min(1, sc / 100 + .08), A: Math.min(1, sc / 100 - .02), K: Math.min(1, sc / 100 + .04), V: Math.max(0, sc / 100 - .12), C: Math.min(1, sc / 100 - .05) }, mood: 60 + i * 3, x: i < 2 ? 1 : 0, mode: 'choice' }); });
+  for (let i = 0; i < 6; i++) s.drills.push({ at: new Date(base + i * 1.4 * 864e5).toISOString(), id: 'o' + (i + 1), q: 2 });
+  return s;
+}
+
+/* ---------- 啟動 ---------- */
+state = demo ? demoState() : load();
+if (demo) document.documentElement.classList.add('demo');
+applyPrefs();
+if (demo === 'play' || demo === 'result') {
+  startPlay('s1');
+  const t = SCENARIOS[0].turns;
+  answer(t[0].o[0]);
+  if (demo === 'play') answer(null, '卡粉通常跟缺水有關，想了解一下您平常早晚保養有哪幾個步驟呢？洗完臉會緊繃嗎？');
+  else { answer(t[1].o[0]); answer(t[2].o[1]); answer(t[3].o[0]); }
+} else {
+  if (demo === 'progress') location.hash = 'progress';
+  if (demo === 'knowledge') location.hash = 'knowledge';
+  route();
+}
+if (!state.profile.onboarded && !demo && !location.hash.startsWith('#play/')) openWelcome();
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && !demo) {
+  const hadController = !!navigator.serviceWorker.controller; // 第一次安裝不算更新
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const w = reg.installing;
+      w && w.addEventListener('statechange', () => {
+        if (w.state === 'activated' && hadController) toast('銷售教練有新版本了', '立即更新', () => location.reload());
+      });
+    });
+  }).catch(() => { /* 不支援時照常使用 */ });
+}
+</script>
+</body>
+</html>
