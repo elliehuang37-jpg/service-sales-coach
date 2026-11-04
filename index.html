@@ -702,6 +702,8 @@ const allProducts = () => [...PRODUCTS, ...state.customProd];
 const prod = id => allProducts().find(p => p.id === id);
 const allScen = () => [...SCENARIOS, ...state.customScen];
 const scen = id => allScen().find(s => s.id === id);
+// 情境標題本身可能已有引號，不再多包一層
+const quoted = t => t.includes('「') ? t : `「${t}」`;
 const parseS = s => { const o = {}; String(s || '').replace(/([EAKVC])(-?\d)/g, (_, k, v) => { o[k] = (o[k] || 0) + Number(v); }); return o; };
 const best = sid => { const xs = state.sessions.filter(x => x.sid === sid); return xs.length ? Math.max(...xs.map(x => x.score)) : null; };
 
@@ -1285,7 +1287,7 @@ function renderProgress() {
     </div>
     <div class="card"><h3 style="margin-top:0">五力雷達（最近 20 次）</h3>${S.length ? radar(av) + DIMS.map(d => av[d.k] != null ? dimRow(d, av[d.k]) : '').join('') : '<p class="muted">完成第一個情境練習後，這裡會出現你的五力分析。</p>'}</div>
     <div class="card"><h3 style="margin-top:0">分數趨勢</h3>${trend(S.slice(-12).map(s => s.score))}<p class="small muted" style="margin:0">本週練習 ${week} 次（含快問快答）｜虛線為 80 分</p></div>
-    <div class="card"><div class="row"><span style="font-size:1.6rem">🎯</span><div class="grow"><b>教練建議下一步</b><br><span class="small">${weak ? `你的「${DIM[weak].n}」相對較弱。${DIM[weak].tip}` : '先完成一個情境練習，教練會分析你的強項與弱項。'}</span></div></div><button class="btn primary block" style="margin-top:10px" data-act="play" data-id="${rec.id}">▶ 練「${esc(rec.title)}」</button></div>
+    <div class="card"><div class="row"><span style="font-size:1.6rem">🎯</span><div class="grow"><b>教練建議下一步</b><br><span class="small">${weak ? `你的「${DIM[weak].n}」相對較弱。${DIM[weak].tip}` : '先完成一個情境練習，教練會分析你的強項與弱項。'}</span></div></div><button class="btn primary block" style="margin-top:10px" data-act="play" data-id="${rec.id}">▶ 練${esc(quoted(rec.title))}</button></div>
     <h2>徽章</h2><div class="card" style="display:flex;flex-wrap:wrap;justify-content:center">${badges().map(b => `<span class="badge ${b.on ? 'on' : ''}"><b>${b.i}</b>${b.n}</span>`).join('')}</div>
     <h2>各情境最佳成績</h2>
     <div class="card">${SCENARIOS.map(s => { const b = best(s.id); return `<button class="list-btn" data-act="play" data-id="${s.id}"><span class="ic">${s.p.av}</span><span class="grow">${esc(s.title)}<br><span class="small muted">${s.ch}｜${s.skill}</span></span><span class="score-badge ${pctClass(b)}">${b == null ? '未練' : b}</span></button>`; }).join('')}</div>
@@ -1431,7 +1433,7 @@ document.addEventListener('click', e => {
     case 'say': e.stopPropagation(); speak(el.dataset.t); break;
     case 'replay': { const sid = play.sc.id; play = null; startPlay(sid); renderPlay(); scrollTo(0, 0); break; }
     case 'next-rec': { const r = recommend().s; play = null; startPlay(r.id); renderPlay(); scrollTo(0, 0); break; }
-    case 'share-result': shareText(`🎯【銷售教練】我完成了「${play.sc.title}」練習，拿到 ${play.result.score} 分！\n` + DIMS.filter(d => d.k in play.result.dims).map(d => `${d.i}${d.n} ${Math.round(play.result.dims[d.k] * 100)}`).join('　')); break;
+    case 'share-result': shareText(`🎯【銷售教練】我完成了${quoted(play.sc.title)}練習，拿到 ${play.result.score} 分！\n` + DIMS.filter(d => d.k in play.result.dims).map(d => `${d.i}${d.n} ${Math.round(play.result.dims[d.k] * 100)}`).join('　')); break;
     case 'ai-prompt': openAI(id); break;
     case 'copy-ai': copyText($('#aiText').value, '已複製，貼到 AI 就能開始練習'); break;
     case 'drill': openDrill(); break;

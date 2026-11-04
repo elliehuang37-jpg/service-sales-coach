@@ -1,6 +1,6 @@
 // 離線快取。VERSION 由 scripts/stamp-sw.js 依檔案內容自動更新，內容一改就會換新快取。
 // 同一個 github.io 網域上還有其他 App 的快取，這裡只清 ssc- 開頭的舊快取。
-const VERSION = 'v-d835333edb';
+const VERSION = 'v-ef8933336d';
 const CACHE = 'ssc-' + VERSION;
 const SHELL = [
   './',
