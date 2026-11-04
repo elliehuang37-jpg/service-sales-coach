@@ -5,6 +5,8 @@
 
 適用：教育訓練、TM、門市、銷售新人、客服。
 
+線上版：https://elliehuang37-jpg.github.io/service-sales-coach/
+
 ## 功能
 
 | 分頁 | 內容 |
